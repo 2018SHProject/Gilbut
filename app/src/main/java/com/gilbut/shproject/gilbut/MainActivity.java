@@ -11,6 +11,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        /////////////진입 시 보호자와 대상 DB 생성/////////////
 
         //////////////////////////////////////
 
