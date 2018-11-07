@@ -9,7 +9,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyApM2zQHGL6-tYDPecWQKp-3M0xu2xRKXQ" />
+
         <activity android:name=".MainActivity">
+
+        </activity>
+        <activity
+            android:name=".ProtectorActivity"
+            android:label="@string/title_activity_protector"
+            android:theme="@style/AppTheme.NoActionBar">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Gilbut</string>
+    <string name="title_activity_protector">ProtectorActivity</string>
 </resources>
