@@ -55,10 +55,8 @@ public class TargetActivity extends AppCompatActivity {
 //        target.setAlarm(alarm);
     }
 
-    public void checkAgreement(){
-        //status값이 1이고 isAgreed값이 true면 showToggle()을, false면 showAgreementPop()실행.
-        //그 반환 값이 true면 다시 showToggle()을 실행하고 false면 showWarning()을 띄운다
-
+    public void checkStatus(){
+        //status를 확인해서 각각 상황에 맞는 작업을 수행한다.
         int status = target.getStatus();
         if(status == 2){
             //연결이 완료되어있는경우
@@ -68,6 +66,7 @@ public class TargetActivity extends AppCompatActivity {
         else if(status == 1){
             //showWarning();
             //수락만 했고 위치정보는 허락 안한경우
+            //showAgreementPop()??
         }
         else if(status == 3){
             //showRefused();
@@ -83,26 +82,17 @@ public class TargetActivity extends AppCompatActivity {
         }
     }
 
-
-
-    public void showToggle(){
-        //한 자리에 오래 머무를 경우 보호자에게 알림이 가는 서비스를
-        //on/off할 수 있는 토글을 보여주고, 사용자가 on/off일 경우 서버에 그 변경된
-        //값을 저장한다. default값은 true
-    }
-
     public void connect(){
         //checkStatus()를 실행한다. 이 후 보호자의 이메일을 등록할 수 있는
         //입력 창이 보이며, 이메일을 입력 후 연결 요청을 누르면 멤버변수 yid의 값에
         //입력한 이메일이 등록이 되고 멤버변수 status의 값이 0으로 바뀌고 서버에 갱신한다
     }
 
-    public void checkStatus(){
-        //서버에서 status값을 받아와 멤버변수 status에 저장하고, 그 값이 -1이면 아무것도
-        //띄우지 않고 0이면 요청을 보낸 상태라는 문구를 띄우고 2이면 showRefused()를 실행
-        //1이면 checkAgreement()를 실행한다
+    public void showToggle(){
+        //한 자리에 오래 머무를 경우 보호자에게 알림이 가는 서비스를
+        //on/off할 수 있는 토글을 보여주고, 사용자가 on/off일 경우 서버에 그 변경된
+        //값을 저장한다. default값은 true
     }
-
 
     public void setLocation(){
         //3분 간격으로 내 위도, 경도를 lat,log에 저장해 서버에 전송한다.
