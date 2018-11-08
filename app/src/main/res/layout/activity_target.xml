@@ -1,9 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".TargetActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/noProtector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="연결된 보호자가 없습니다."
+        android:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/tWait"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="보호자의 수락을 기다리는 중입니다."
+        android:visibility="gone"/>
+    <Button
+        android:id="@+id/tAlarmOn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="위치전송 ON"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/tAlarmOff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="위치전송 OFF"
+        android:visibility="gone"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_margin="30dp"
+        android:clickable="true"
+        app:backgroundTint="@color/cast_intro_overlay_button_background_color"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/add" />
+
+
+</android.support.design.widget.CoordinatorLayout>

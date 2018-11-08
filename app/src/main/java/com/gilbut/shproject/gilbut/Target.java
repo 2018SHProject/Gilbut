@@ -8,6 +8,7 @@ public class Target {
     private double latitude;                                            //위도
     private double longitude;                                           //경도
     private Boolean alarm;                                              //보호자에게가는 알람서비스 on/off
+    //private long key;
 
     public void setM_Id(String m_Id){this.m_Id = m_Id;}
     public void setY_Id(String y_Id){this.y_Id = y_Id;}
