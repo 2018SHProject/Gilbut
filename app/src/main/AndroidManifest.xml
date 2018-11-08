@@ -15,7 +15,7 @@
 
         <activity android:name=".MainActivity"></activity>
         <activity
-            android:name=".ProtectorActivity"
+            android:name=".TargetActivity"
             android:label="@string/title_activity_protector"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -24,7 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TargetActivity"></activity>
+        <activity android:name=".ProtectorActivity"></activity>
     </application>
 
 </manifest>

@@ -7,7 +7,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
         ////////지금은 화면 선택 후 접속////////
         ////////TargetActivity 불러오기///////
         //////ProtectorActivity 불러오기//////
-
         /////////////////////////////////////
     }
 }
