@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -16,17 +17,20 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+
+import static com.gilbut.shproject.gilbut.R.id;
+import static com.gilbut.shproject.gilbut.R.layout;
 
 public class ProtectorActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
 
-    MapFragment mapFragment;
+
+    SupportMapFragment mapFragment;
     GoogleMap map;
     GoogleApiClient googleApiClient = null;
+
     double latitude;
     double longitude;
 
@@ -47,24 +51,32 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_protector);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setContentView(layout.activity_protector);
+        Toolbar toolbar = (Toolbar) findViewById(id.toolbar);
         setSupportActionBar(toolbar);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED){
             checkPer();
+            // 퍼미션 허용
         }
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             init();
-
-
-            //latitude = 37.5557750;
-            //longitude = 126.9724722;
-
-            // 대상 좌표 받아와야함
-           //updateMap(latitude, longitude);
+            // 화면 초기화
         }
+
+        PTB = (ToggleButton)findViewById(id.PTB);
+        PTB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+
+                }
+                else{
+
+                }
+            }
+        });
 
 
     }
@@ -74,14 +86,15 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
                 new String[]{
                         android.Manifest.permission.INTERNET,
                         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                 },
                 0
         );
     }
 
     public void init(){
-        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         if (googleApiClient == null) {
@@ -95,17 +108,9 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     }
 
     public void updateMap(double lat, double lng){
-        map.clear();
-        final LatLng Loc = new LatLng(lat, lng);
+        final LatLng Loc = new LatLng(latitude, longitude);
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
 
-        MarkerOptions options = new MarkerOptions();
-        options.position(Loc);
-        //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
-        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-
-        options.title("대상의 위치");
-        map.addMarker(options);
     }
 
     @Override
@@ -146,9 +151,14 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            map.setMyLocationEnabled(true);
-        }
+
+        latitude = 37.5557750;
+        longitude = 126.9724722;
+        // 가장 최근 대상 위치
+
+        LatLng Loc = new LatLng(latitude, longitude);
+
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
+
     }
 }
