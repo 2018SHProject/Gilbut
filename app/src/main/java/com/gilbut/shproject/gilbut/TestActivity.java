@@ -7,12 +7,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.gilbut.shproject.gilbut.models.Connection;
-
 import java.util.concurrent.ExecutionException;
 
 public class TestActivity extends AppCompatActivity {
-    FirestoreHandler firestoreHandler;
+    FirestoreController firestoreController;
     TextView textView;
     Button btn;
     Connection connection;
@@ -20,20 +18,27 @@ public class TestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        firestoreHandler = new FirestoreHandler();
+        firestoreController = new FirestoreController();
         textView = (TextView) findViewById(R.id.textview);
         btn = (Button) findViewById(R.id.btn);
     }
     public void btnClicked(View v) throws ExecutionException, InterruptedException {
-        firestoreHandler.setConnectionFirestoreListener(new FirestoreHandler.ConnectionFirestoreListener() {
+        textView.setText("잠시만 기다려주세요");
+        firestoreController.setOnDatabaseGetEventListener(new FirestoreController.OnDatabaseGetEventListener() {
             @Override
-            public void onReceivedData(Connection newConnection) {
-                connection = newConnection;
-                Log.d("no", "nn"+newConnection);
-                textView.setText(Integer.toString(connection.getConnection()));
+            public void onGetConnectionSuccess(Connection newData) {
+                textView.setText(newData.getTarget_id());
+                Log.d("되라되리되", newData.getTarget_id());
+            }
+
+            @Override
+            public void onGetConnectionFailure() {
+
             }
         });
-        firestoreHandler.getConnection("target1", "protector1");
 
+        firestoreController.getConnection("target1", "protector1");
     }
+
+    ///public void updateData
 }
