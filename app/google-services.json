@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "573046188850",
+    "firebase_url": "https://gilbut-team10.firebaseio.com",
+    "project_id": "gilbut-team10",
+    "storage_bucket": "gilbut-team10.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573046188850:android:cae7e6e25aa5f3e2",
+        "android_client_info": {
+          "package_name": "com.gilbut.shproject.gilbut"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "573046188850-bird9f75t23shdg24g4ji2555s604t7g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gilbut.shproject.gilbut",
+            "certificate_hash": "5b518ad98a0ce8aeeb039ed8449fcd66ca010ee5"
+          }
+        },
+        {
+          "client_id": "573046188850-cnmsm7c73u1hgrphf1ia3fjdup3i96qf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gilbut.shproject.gilbut",
+            "certificate_hash": "122c9584201d8ffdd971d8871a9958018f28f14c"
+          }
+        },
+        {
+          "client_id": "573046188850-faob2m9jgp4klbhrcq7ks5f1gujkn46t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_uJ_9cgT60pJC00TcQohgssrFAPzbvco"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "573046188850-faob2m9jgp4klbhrcq7ks5f1gujkn46t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
