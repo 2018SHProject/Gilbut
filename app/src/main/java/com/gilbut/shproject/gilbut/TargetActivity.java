@@ -1,14 +1,23 @@
 package com.gilbut.shproject.gilbut;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +32,7 @@ import android.widget.Toast;
 
 public class TargetActivity extends AppCompatActivity {
 
+    LocationManager locationManager;
     Target target;                                                              //대상 유저 클래스
     Intent intent;
     Button onBtn;                                                               //위치전송 on 버튼
@@ -30,20 +40,30 @@ public class TargetActivity extends AppCompatActivity {
     TextView noProtector;                                                       //연결된 보호자가 없을 때 띄울 메세지
     TextView tWait;                                                             //보호자의 수락을 기다릴 때 보일 메세지.
     FloatingActionButton fab;                                                   //Fab
+    double latitude;
+    double longitude;
+
+    String[] permission_list={
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.INTERNET,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.SEND_SMS
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_target);
         init();                                                                 //제대로 들어왔는지 확인
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         setting();                                                              //초기값 세팅
         checkStatus();
+
     }
+
+
+
 
     public void init(){
         //MainActivity에서 넘긴 정보를 가지고 DB에 저장되어있는 대상 / 연결정보를 가져온다.
@@ -55,11 +75,11 @@ public class TargetActivity extends AppCompatActivity {
         tWait = (TextView)findViewById(R.id.tWait);
         fab = (FloatingActionButton)findViewById(R.id.fab);
 
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog ad = new AlertDialog.Builder(getApplicationContext())
-                        .create();
+                AlertDialog ad = new AlertDialog.Builder(TargetActivity.this).create();
 
                 ad.setTitle("보호자 등록");       // 제목 설정
                 ad.setMessage("보호자로 등록할 아이디를 적어주세요. 해당 요청은 위치정보공유허락을 의미합니다.");   // 내용 설정
@@ -82,7 +102,9 @@ public class TargetActivity extends AppCompatActivity {
                 ad.setButton(DialogInterface.BUTTON_NEGATIVE,"취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), "취소하였습니다", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
+
 
                     }
                 });
@@ -156,18 +178,52 @@ public class TargetActivity extends AppCompatActivity {
     }
 
     public void showToggle(){
-        //한 자리에 오래 머무를 경우 보호자에게 알림이 가는 서비스를
-        //on/off할 수 있는 토글을 보여주고, 사용자가 on/off일 경우 서버에 그 변경된
-        //값을 저장한다. default값은 true
-        //toggle을 visible하게 만들고 listener 달자. 이건 메인에서? 아니면 여기서?
-        //이거 그냥 저 위에 바로 넣어도 될 듯한데?
-        //그리고 db의 알람값 가져와서 true, false일 경우 나눠서 설정해야함!
-//        onBtn.setVisibility(View.VISIBLE);
-//        offBtn.setVisibility(View.GONE);
+        if(target.getAlarm()){                          //만약 alarm을 켜 놓은 경우라면?
+            onBtn.setVisibility(View.GONE);
+            offBtn.setVisibility(View.VISIBLE);
+        }else{                                          //alarm을 끈 경우
+            onBtn.setVisibility(View.VISIBLE);
+            offBtn.setVisibility(View.GONE);
+        }
+
+        onBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                target.setAlarm(true);
+                //db에도 저장
+                Toast.makeText(getApplicationContext(),"보호자에게 알림을 보냅니다",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        offBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                target.setAlarm(false);
+                //db에도 저장
+                Toast.makeText(getApplicationContext(),"보호자에게 알림이 가지 않습니다",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        setLocation();
     }
     public void setLocation(){
-        //3분 간격으로 내 위도, 경도를 lat,log에 저장해 서버에 전송한다.
-        //메인에서 listener? 아니면 여기서?
+
+        String locationProvider = null;
+        ContextCompat.checkSelfPermission(this, String.valueOf(permission_list));                                                   //권한확인하고
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if(locationManager.isProviderEnabled(locationManager.NETWORK_PROVIDER) == true){                                                    //네트워크 우선!
+            locationProvider = LocationManager.NETWORK_PROVIDER;
+        }
+        else if(locationManager.isProviderEnabled(locationManager.GPS_PROVIDER) == true){
+            locationProvider = LocationManager.GPS_PROVIDER;
+        }
+        locationManager.requestLocationUpdates(locationProvider,1000*180,10, locationListener );                        //위치받을세팅 완료
+        //1000 : 1초, 180 : 3분
+    }
+
+    public void select(){
+
     }
 
     public void showRefused(){
@@ -178,4 +234,32 @@ public class TargetActivity extends AppCompatActivity {
         //db도 갱신
         //
     }
+
+
+
+    LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            latitude = location.getLatitude();                                  //위도 받아오기
+            longitude = location.getLongitude();                                //경도 받아오기
+            target.setLocation(latitude,longitude);                             //target에 저장
+            //db에도 저장
+            setLocation();                                                      //다시 해줘서 gps, 네트워크중 최적으로!
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 }

@@ -10,6 +10,16 @@ public class Target {
     private Boolean alarm;                                              //보호자에게가는 알람서비스 on/off
     //private long key;
 
+
+    public Target(){
+        m_Id = null;
+        y_Id = null;
+        status = 10;
+        latitude = -1;
+        longitude = -1;
+        alarm = true;
+    }
+
     public void setM_Id(String m_Id){this.m_Id = m_Id;}
     public void setY_Id(String y_Id){this.y_Id = y_Id;}
     public void setStatus(int status){this.status = status;}
