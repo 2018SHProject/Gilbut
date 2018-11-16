@@ -28,11 +28,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.google.android.gms:play-services:12.0.1'
-<<<<<<< HEAD
     implementation 'com.google.android.gms:play-services-maps:12.0.0'
-=======
     implementation 'com.google.firebase:firebase-core:16.0.1'
->>>>>>> 94b674490ebea6306bc0bae73cb216dfb8f4fe4d
 }
 
 apply plugin: 'com.google.gms.google-services'
