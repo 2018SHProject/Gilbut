@@ -29,18 +29,21 @@
             android:value="AIzaSyApM2zQHGL6-tYDPecWQKp-3M0xu2xRKXQ" />
 
         <activity android:name=".MainActivity">
-
-        </activity>
-        <activity
-            android:name=".ProtectorActivity"
-            android:label="@string/title_activity_protector"
-            android:theme="@style/AppTheme.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".TargetActivity"
+            android:label="@string/title_activity_protector"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".ProtectorActivity" />
+        <activity android:name=".TestActivity">
+
         </activity>
     </application>
 
