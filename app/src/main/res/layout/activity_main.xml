@@ -7,26 +7,18 @@
     android:orientation="vertical"
     android:gravity="center"
     tools:context=".MainActivity">
-
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <TextView
         android:gravity="center"
-        android:orientation="horizontal">
-        <RadioButton
-            android:id="@+id/target"
-            android:text="대상"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
-        <RadioButton
-            android:layout_marginLeft="60sp"
-            android:id="@+id/protector"
-            android:text="보호자"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
-    </RadioGroup>
+        android:text="길 벗"
+        android:textSize="50sp"
+        android:layout_marginBottom="100sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-
-
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/Google_Login"
+        android:layout_width="wrap_content"
+        android:layout_height="50sp">
+    </com.google.android.gms.common.SignInButton>
 
 </LinearLayout>
