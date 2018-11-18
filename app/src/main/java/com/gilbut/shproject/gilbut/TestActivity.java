@@ -38,7 +38,21 @@ public class TestActivity extends AppCompatActivity {
         });
 
         firestoreController.getConnection("target1", "protector1");
+
+        firestoreController.setDatabaseSetEventListener(new FirestoreController.OnDatabaseSetEventListener() {
+            @Override
+            public void onSetConnectionSuccess() {
+                Log.d("set 성공!!", "set 성공!!");
+            }
+
+            @Override
+            public void onSetConnectionFailure() {
+                Log.e("fail", "실패.");
+            }
+        });
+
+        firestoreController.updateStatus("target1", "protector1", -1);
     }
 
-    ///public void updateData
+
 }

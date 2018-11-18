@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,6 +17,7 @@ public class FirestoreController {
     public OnDatabaseGetEventListener getEventListener;
     public OnDatabaseSetEventListener setEventListener;
 
+    // 커넥션 정보 모두(status, targetId, protectorId, id(커넥션 아이디), date(등록된 날짜), range
     public void getConnection (String targetId, String protectorId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         CollectionReference collectionRef = firestore.collection("connection");
@@ -28,7 +28,7 @@ public class FirestoreController {
                 for(DocumentSnapshot document : queryDocumentSnapshots.getDocuments()){
                     Log.d(TAG, "connection(document) => "+ document.getData());
                     Log.d(TAG, "connection(toObject) => "+ document.getString("target_id"));
-                    Connection newData = new Connection(document.getReference(), document.getLong("connection"),document.getString("target_id"), document.getString("protector_id"), document.getLong("id"),document.getTimestamp("date"), document.getDocumentReference("round"));
+                    Connection newData = new Connection(document.getReference(), document.getDouble("status").intValue(),document.getString("target_id"), document.getString("protector_id"), document.getLong("id"),document.getTimestamp("date"), document.getDocumentReference("range"));
                     getEventListener.onGetConnectionSuccess(newData);
                 }
             }
@@ -41,10 +41,44 @@ public class FirestoreController {
         });
     }
 
-    public void updateConnection (Connection connection) {
+    public void setConnection (Connection connection){
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         CollectionReference collectionRef = firestore.collection("connection");
+        //Query query = collectionRef.whereEqualTo("target_id", connection.getTarget_id()).whereEqualTo("protector_id",connection.getProtector_id());
+        collectionRef
+                .document(connection.getTarget_id() + "-"+connection.getProtector_id())
+                .set(connection.getDataMap())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        setEventListener.onSetConnectionSuccess();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                      setEventListener.onSetConnectionFailure();
+                    }
+                });
+    }
 
+    public void updateStatus (String targetId, String protectorId, int status) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        CollectionReference collectionRef = firestore.collection("connection");
+        collectionRef.document(targetId+"-"+protectorId)
+                .update("status", status )
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        setEventListener.onSetConnectionSuccess();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        setEventListener.onSetConnectionFailure();
+                    }
+                });
     }
 
     public void setOnDatabaseGetEventListener(OnDatabaseGetEventListener listener) {

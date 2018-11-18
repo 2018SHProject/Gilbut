@@ -1,13 +1,14 @@
 package com.gilbut.shproject.gilbut;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 
-public class Connection implements Parcelable{
-    private Long connection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Connection {
+    private int status;
     private  String target_id;
     private  String protector_id;
     private  Long id;
@@ -15,8 +16,8 @@ public class Connection implements Parcelable{
     private DocumentReference round;
     private DocumentReference documentRef;
 
-    Connection(DocumentReference documentRef,Long connection, String targetId, String protectorId, Long id, Timestamp date, DocumentReference round){
-        this.connection = connection;
+    Connection(DocumentReference documentRef,int status, String targetId, String protectorId, Long id, Timestamp date, DocumentReference round){
+        this.status = status;
         this.target_id = targetId;
         this.protector_id = protectorId;
         this.id = id;
@@ -24,8 +25,8 @@ public class Connection implements Parcelable{
         this.round = round;
     }
 
-    Connection(DocumentReference documentRef, Long connection, String targetId, String protectorId, Long id, Timestamp date){
-        this.connection = connection;
+    Connection(DocumentReference documentRef, int status, String targetId, String protectorId, Long id, Timestamp date){
+        this.status = status;
         this.target_id = targetId;
         this.protector_id = protectorId;
         this.id = id;
@@ -33,8 +34,8 @@ public class Connection implements Parcelable{
         this.round = null;
     }
 
-    Connection(DocumentReference documentRef, Long connection, String targetId, String protectorId, Long id){
-        this.connection = connection;
+    Connection(DocumentReference documentRef, int status, String targetId, String protectorId, Long id){
+        this.status = status;
         this.target_id = targetId;
         this.protector_id = protectorId;
         this.id = id;
@@ -42,27 +43,9 @@ public class Connection implements Parcelable{
         this.round = null;
     }
 
-    protected Connection(Parcel in) {
-        connection = in.readLong();
-        target_id = in.readString();
-        protector_id = in.readString();
-        id = in.readLong();
-    }
 
-    public static final Creator<Connection> CREATOR = new Creator<Connection>() {
-        @Override
-        public Connection createFromParcel(Parcel in) {
-            return new Connection(in);
-        }
-
-        @Override
-        public Connection[] newArray(int size) {
-            return new Connection[size];
-        }
-    };
-
-    public Long getConnection() {
-        return connection;
+    public int getStatus() {
+        return status;
     }
 
     public Long getId() {
@@ -85,8 +68,19 @@ public class Connection implements Parcelable{
         return date;
     }
 
-    public void setConnection(Long connection) {
-        this.connection = connection;
+    public Map<String,Object> getDataMap(){
+        Map<String, Object> data = new HashMap<>();
+        data.put("status", status);
+        data.put("target_id", target_id);
+        data.put("protector_id", protector_id);
+        data.put("id", id);
+        data.put("date", new Date());
+        data.put("round", round);
+        return data;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public void setDate(Timestamp date) {
@@ -107,19 +101,6 @@ public class Connection implements Parcelable{
 
     public void setTarget_id(String target_id) {
         this.target_id = target_id;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(connection);
-        parcel.writeString(target_id);
-        parcel.writeString(protector_id);
-        parcel.writeLong(id);
     }
 }
 
