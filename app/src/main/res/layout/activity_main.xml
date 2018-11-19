@@ -9,9 +9,16 @@
 
 
     <Button
+        android:text="target"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/btn">
+        android:id="@+id/btnT"/>
+
+    <Button
+        android:text="protector"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/btnP">
 
     </Button>
 

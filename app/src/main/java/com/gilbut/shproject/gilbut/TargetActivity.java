@@ -5,19 +5,16 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -249,7 +246,22 @@ public class TargetActivity extends AppCompatActivity {
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
+            // 아래는 정동 코드에 있어야 할 내용들
+            //firebaseDatabase = FirebaseDatabase.getInstance();
+            //databaseReference = firebaseDatabase.getReference("TargetLatlng");
 
+            // 임시로 붙인 레퍼런스 이름 - 정동이 디비에 보낼 때 지정하는 이름
+
+
+            // 가장 처음 들어갈 때 코드
+            // Target target = new Target("대상Id", "보호자Id", 1 , latitude, longitude, true);
+            // databaseReferece.child("대상Id").setValue(target);
+
+            // 대상 별 좌표 업뎃됐을 때 코드
+            //Map<String, Object> map = new HashMap<String, Object>();
+            //map.put("대상Id"/latitude",36.457821);
+            //map.put("대상Id"/longitude",127.457821);
+            //databaseReference.updateChildren(map);
         }
 
         @Override

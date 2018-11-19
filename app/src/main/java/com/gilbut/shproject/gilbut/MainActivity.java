@@ -12,7 +12,8 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button button;
+    Button buttonP;
+    Button buttonT;
     String[] permission_list={
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -36,8 +37,17 @@ public class MainActivity extends AppCompatActivity {
         ////////지금은 화면 선택 후 접속////////
         ////////TargetActivity 불러오기///////
 
-        button = (Button)findViewById(R.id.btn);
-        button.setOnClickListener(new View.OnClickListener() {
+        buttonP = (Button)findViewById(R.id.btnP);
+        buttonP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), TargetActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        buttonT = (Button)findViewById(R.id.btnT);
+        buttonT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ProtectorActivity.class);

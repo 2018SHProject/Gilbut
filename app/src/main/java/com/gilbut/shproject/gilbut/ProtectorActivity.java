@@ -75,6 +75,26 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             // 화면 초기화
         }
 
+        switch (protector.status){
+            case -1 :
+                // 미연결 상태
+
+                
+                break;
+            case 0 :
+                // 요청 왔지만 승인 안 한 상태
+                break;
+            case 1 :
+                // 요청 승인 후
+                initFire();
+                break;
+            case 2 :
+                // 거절 알림 후 -1로 변경
+                break;
+
+        }
+
+
         PTB = (ToggleButton)findViewById(id.PTB);
         PTB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -117,13 +137,24 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
         // 연결 되어있는 지 확인
 
+
+    }
+
+    public void updateMap(double lat, double lng){
+        final LatLng Loc = new LatLng(latitude, longitude);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
+
+        // 여기서 범위 이탈 체크하고 알림 주기
+
+    }
+
+    public void initFire(){
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("TargetLatlng");
         // 임시로 붙인 레퍼런스 이름 - 정동이 디비에 보낼 때 지정하는 이름
-        //
-        // Target target = new Target("대상Id", "보호자Id", 1 , latitude, longitude, true);
-        // databaseReferece.child("대상Id").setValue(target);
-        // 대상 별 좌표 업뎃 됨
+
+
+
         childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -133,11 +164,11 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 // 나와 연결 된 대상의 좌표 읽어오기 - 대상의 yId가 나일 때 읽어오기 등등
-                String message = dataSnapshot.getValue(String.class);
-                String tmp[] = message.split("-");
-                LatLng latLng = new LatLng(Double.valueOf(tmp[0]), Double.valueOf(tmp[1]));
-                updateMap(latLng.latitude, latLng.longitude);
-                // DB 값이 변화됐을 때
+                // 업데이트 된 정보의 yId가 나일 때 적용
+                Target message = dataSnapshot.getValue(Target.class);
+                // 현재 좌표로만 36.14578 - 127.568978 로 저장되어있다고 가정했을 때 받아오는 방식
+                updateMap(message.getLatitude(), message.getLongitude());
+                // DB 값이 변화됐을 때 -
             }
 
             @Override
@@ -156,11 +187,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             }
         };
 
-    }
-
-    public void updateMap(double lat, double lng){
-        final LatLng Loc = new LatLng(latitude, longitude);
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
 
     }
 
