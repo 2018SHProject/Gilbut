@@ -2,6 +2,7 @@ package com.gilbut.shproject.gilbut;
 
 import android.support.annotation.Nullable;
 
+import com.gilbut.shproject.gilbut.model.Connection;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

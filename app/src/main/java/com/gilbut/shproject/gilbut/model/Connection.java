@@ -1,4 +1,4 @@
-package com.gilbut.shproject.gilbut;
+package com.gilbut.shproject.gilbut.model;
 public class Connection {
     public  Long status;
     public String tId;
