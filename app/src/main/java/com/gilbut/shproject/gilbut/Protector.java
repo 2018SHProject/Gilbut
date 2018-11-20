@@ -16,7 +16,9 @@ public class Protector {
     List<LatLng> latlngs;
     ;
 
-    Protector(){};
+    Protector(){
+        this.status = 0;
+    };
     Protector(String mId){this.mId = mId;};
 
     void PsetmId(String mId){this.mId = mId;};
