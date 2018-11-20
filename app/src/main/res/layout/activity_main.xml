@@ -4,20 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
     tools:context=".MainActivity">
-    <TextView
-        android:gravity="center"
-        android:text="길 벗"
-        android:textSize="50sp"
-        android:layout_marginBottom="100sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/Google_Login"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="50sp">
     </com.google.android.gms.common.SignInButton>
 
