@@ -111,7 +111,7 @@ public class TargetActivity extends AppCompatActivity {
                         String y_Id = editText.getText().toString();
                         target.setY_Id(y_Id);
                         // (대상 id, 보호자 id, status, 성공시 콜백-OnSetCompleteListener)
-                        connectionController.addNewConnection(target.getM_Id(), target.getY_Id(), -1, new ConnectionController.OnSetCompleteListener() {
+                        connectionController.addNewConnection(target.getM_Id(), target.getY_Id(), 0, new ConnectionController.OnSetCompleteListener() {
                             @Override
                             public void onComplete() {
                                 //새로운 연결 생성 완료.
@@ -120,12 +120,6 @@ public class TargetActivity extends AppCompatActivity {
                         });
 
                         target.setStatus(0);
-                        connectionController.updateConnectionStatus(target.getM_Id(), target.getY_Id(), 0, new ConnectionController.OnSetCompleteListener() {
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
 
                         //바로 이전의 키값을 저장하고 있다고 할까? (db에 적용), 그러면 새로 넣을 경우에 이전 키값을 지워버리면 되잖아!
                         dialog.dismiss();
