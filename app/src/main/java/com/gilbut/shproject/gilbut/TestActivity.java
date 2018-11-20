@@ -26,31 +26,59 @@ public class TestActivity extends AppCompatActivity {
         connectionController = new ConnectionController();
 
         textView.setText("잠시만 기다려주세요");
-        connectionController.addNewConnection("target1", "protector1", 1, new ConnectionController.OnSetCompleteListener() {
+        //추가 예시
+//        connectionController.addNewConnection("target1", "protector1", 1, new ConnectionController.OnSetCompleteListener() {
+//            @Override
+//            public void onComplete() {
+//                textView.setText("성공");
+//
+//                //GetConection 예시
+//                connectionController.getConnection("target1", "protector1", new ConnectionController.OnGetConnectionListener() {
+//                    @Override
+//                    public void onComplete(Connection connection) {
+//                        textView.setText(connection.tId);
+//                    }
+//
+//                    @Override
+//                    public void onFailure() {
+//
+//                    }
+//                });
+//            }
+//        });
+
+        //업데이트 예시
+//        connectionController.updateConnectionStatus("tf", "p", 2, new ConnectionController.OnSetCompleteListener() {
+//            @Override
+//            public void onComplete() {
+//
+//            }
+//        });
+
+        //getAlarm 에시
+//        connectionController.getAlarm("target1", "protector1", new ConnectionController.OnGetAlarmListener() {
+//            @Override
+//            public void onComplete(boolean status) {
+//                textView.setText(String.valueOf(status));
+//            }
+//
+//            @Override
+//            public void onFailure() {
+//
+//            }
+//        });
+
+        connectionController.getConnection("fff", new ConnectionController.OnGetConnectionListener() {
             @Override
-            public void onComplete() {
-                textView.setText("성공");
-                connectionController.getConnection("target1", "protector1", new ConnectionController.OnGetConnectionListener() {
-                    @Override
-                    public void onComplete(Connection connection) {
-                        textView.setText(connection.tId);
-                    }
+            public void onComplete(Connection connection) {
+                textView.setText(connection.pId);
+            }
 
-                    @Override
-                    public void onFailure() {
-
-                    }
-                });
+            @Override
+            public void onFailure(String err) {
+                textView.setText(err);
             }
         });
-
-        connectionController.updateConnectionStatus("tf", "p", 2, new ConnectionController.OnSetCompleteListener() {
-            @Override
-            public void onComplete() {
-
-            }
-        });
-
     }
 
 

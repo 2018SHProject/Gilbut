@@ -14,6 +14,7 @@ package com.gilbut.shproject.gilbut;
         import android.support.v4.app.ActivityCompat;
         import android.support.v4.content.ContextCompat;
         import android.support.v7.app.AppCompatActivity;
+        import android.util.Log;
         import android.view.View;
         import android.widget.Button;
         import android.widget.EditText;
@@ -163,8 +164,11 @@ public class TargetActivity extends AppCompatActivity {
                 target.setAlarm(connection.alarm);
         }
 
-        @Override
-            public void onFailure() {
+            @Override
+            public void onFailure(String err) {
+                if(err.equals("NO_DATA")){
+                    // 연결이 없을 때.
+                }
                 target.setY_Id(null);
                 target.setStatus(-1);
                 target.setAlarm(false);

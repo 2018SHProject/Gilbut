@@ -131,7 +131,7 @@ public class ConnectionController {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                onGetCompleteListener.onFailure();
+                onGetCompleteListener.onFailure("CANCELLED");
             }
         });
     }
@@ -149,7 +149,7 @@ public class ConnectionController {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                onGetConnectionListener.onFailure();
+                onGetConnectionListener.onFailure("CANCELLED");
             }
         });
     }
@@ -163,12 +163,14 @@ public class ConnectionController {
                     Connection connection = targetSnapshot.getValue(Connection.class);
                     if (connection != null && connection.tId != null && connection.tId.equals(targetId)) {
                         onGetConnectionListener.onComplete(connection);
+                    }else {
+                        onGetConnectionListener.onFailure("NO_DATA");
                     }
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                onGetConnectionListener.onFailure();
+                onGetConnectionListener.onFailure("CANCELLED");
             }
         });
     }
@@ -188,18 +190,39 @@ public class ConnectionController {
         });
     }
 
+    public void getAlarm(String targetId, String protectorId, final OnGetAlarmListener onGetAlarmListener){
+        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Connection connection = dataSnapshot.getValue(Connection.class);
+                onGetAlarmListener.onComplete(connection.alarm);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public interface OnSetCompleteListener {
         public void onComplete();
     }
 
     public interface OnGetCompleteListener {
         public void onComplete(int status);
-        public void onFailure();
+        public void onFailure(String err);
     }
 
     public interface OnGetConnectionListener {
         public void onComplete(Connection connection);
-        public void onFailure();
+        public void onFailure(String err);
+    }
+
+    public interface OnGetAlarmListener {
+        public void onComplete(boolean alarm);
+        public void onFailure(String err);
     }
 
     public interface OnGetFailureListener {
