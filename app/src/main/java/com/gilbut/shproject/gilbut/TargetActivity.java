@@ -150,7 +150,7 @@ public class TargetActivity extends AppCompatActivity {
 
     public void setting(){
 
-        String m_Id = intent.getStringExtra("mid");
+        String m_Id = intent.getStringExtra("mId");
 
         //m_id로 연결db에서 정보들을 가져와 y_id, status를 초기화한다.
         connectionController = new ConnectionController();
@@ -161,9 +161,9 @@ public class TargetActivity extends AppCompatActivity {
                 target.setY_Id(connection.pId);
                 target.setStatus(connection.status.intValue());
                 target.setAlarm(connection.alarm);
-            }
+        }
 
-            @Override
+        @Override
             public void onFailure() {
                 target.setY_Id(null);
                 target.setStatus(-1);
