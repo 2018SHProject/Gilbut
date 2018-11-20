@@ -89,10 +89,19 @@ public class TargetActivity extends AppCompatActivity {
                 ad.setButton(DialogInterface.BUTTON_POSITIVE,"요청 전송", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //파베에 새로운 연결 생성.
+                        ConnectionController connectionController = new ConnectionController();
+                        // (대상 id, 보호자 id, status, 성공시 콜백-OnSetCompleteListener)
+                        connectionController.addNewConnection(target.getM_Id(), target.getY_Id(), -1, new ConnectionController.OnSetCompleteListener() {
+                            @Override
+                            public void onComplete() {
+                                //새로운 연결 생성 완료.
+                                 Toast.makeText(getApplicationContext(), "요청완료", Toast.LENGTH_SHORT).show();
+                            }
+                        });
 //                        target.setStatus(0);
 //                        String y_Id = editText.getText().toString();
                         //바로 이전의 키값을 저장하고 있다고 할까? (db에 적용), 그러면 새로 넣을 경우에 이전 키값을 지워버리면 되잖아!
-                        Toast.makeText(getApplicationContext(), "요청완료", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                 });
@@ -101,8 +110,6 @@ public class TargetActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getApplicationContext(), "취소하였습니다", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-
-
                     }
                 });
 

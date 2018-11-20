@@ -1,16 +1,13 @@
 package com.gilbut.shproject.gilbut;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -92,54 +89,54 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
         // switch 안의 것이 나중에는 Connection의 변수 중 하나가 되어야 겟디요
         // 우선 보기 쉽게 한 곳에 몰아 넣었음
-        switch (protector.status){
-
-            case 0 :
-                // 요청 들어 온 상태
-                new AlertDialog.Builder(this)
-                        .setTitle("<연결 요청 알림>")
-                        .setView(dialview)
-                        .setPositiveButton("연결", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                protector.status = 1;
-                                textView.setText("연결 승인");
-                                toast.setView(toastview);
-                                toast.setGravity(Gravity.CENTER,0,0);
-                                toast.setDuration(Toast.LENGTH_LONG);
-                                toast.show();
-                            }
-                        })
-                        .setNegativeButton("거절", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                protector.status = 2;
-                                textView.setText("연결 거부");
-                                toast.setView(toastview);
-                                toast.setGravity(Gravity.CENTER,0,0);
-                                toast.setDuration(Toast.LENGTH_LONG);
-                                toast.show();
-                            }
-                        }).show();
-                //break;
-            case 1 :
-                // 요청 승인 확인
-
-
-                initFire();
-                break;
-            case 2 :
-
-                // 거절 알림 후 -1로 변경
-                break;
-
-            case -1 :
-                // 미연결 상태
-
-
-                break;
-
-        }
+//        switch (protector.status){
+//
+//            case 0 :
+//                // 요청 들어 온 상태
+//                new AlertDialog.Builder(this)
+//                        .setTitle("<연결 요청 알림>")
+//                        .setView(dialview)
+//                        .setPositiveButton("연결", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                protector.status = 1;
+//                                textView.setText("연결 승인");
+//                                toast.setView(toastview);
+//                                toast.setGravity(Gravity.CENTER,0,0);
+//                                toast.setDuration(Toast.LENGTH_LONG);
+//                                toast.show();
+//                            }
+//                        })
+//                        .setNegativeButton("거절", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                protector.status = 2;
+//                                textView.setText("연결 거부");
+//                                toast.setView(toastview);
+//                                toast.setGravity(Gravity.CENTER,0,0);
+//                                toast.setDuration(Toast.LENGTH_LONG);
+//                                toast.show();
+//                            }
+//                        }).show();
+//                //break;
+//            case 1 :
+//                // 요청 승인 확인
+//
+//
+//                initFire();
+//                break;
+//            case 2 :
+//
+//                // 거절 알림 후 -1로 변경
+//                break;
+//
+//            case -1 :
+//                // 미연결 상태
+//
+//
+//                break;
+//
+//        }
 
 
         PTB = (ToggleButton)findViewById(id.PTB);
