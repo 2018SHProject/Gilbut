@@ -9,11 +9,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity{
                     Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
                     // 1. Google PlayStore 계정을 먼저 인증할거임
                     startActivityForResult(signInIntent, RC_SIGN_IN);
+                    mGoogleApiClient.connect();
                 }
             });
         }
@@ -73,17 +75,24 @@ public class MainActivity extends AppCompatActivity{
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if(result.isSuccess()) {
-                // 2. Google PlayStore 계정이 인증 된거임
-                GoogleSignInAccount account = result.getSignInAccount();
-                // 3. 인증된 계정으로 Firebase Auth에 인증 요청 보낼거임
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
-            }
-            else {
-                // 구글 플레이스토어 인증 실패
+            } catch (ApiException e) {
                 Toast.makeText(getApplicationContext(), "구글 인증 실패", Toast.LENGTH_SHORT).show();
             }
+//            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+//            if(result.isSuccess()) {
+//                // 2. Google PlayStore 계정이 인증 된거임
+//                GoogleSignInAccount account = result.getSignInAccount();
+//                // 3. 인증된 계정으로 Firebase Auth에 인증 요청 보낼거임
+//                firebaseAuthWithGoogle(account);
+//            }
+//            else {
+//                // 구글 플레이스토어 인증 실패
+//                Toast.makeText(getApplicationContext(), "구글 계정 인증 실패", Toast.LENGTH_SHORT).show();
+//            }
         }
     }
 
