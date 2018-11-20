@@ -33,6 +33,12 @@
         <activity android:name=".TargetActivity"></activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".ProtectorActivity" />
+<<<<<<< HEAD
+=======
+        <activity android:name=".TestActivity">
+
+        </activity>
+>>>>>>> e7cea496b5c4f3d4b60d8d04eeabfb1012886385
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,7 +46,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<<<<<<< HEAD
 
+=======
+>>>>>>> e7cea496b5c4f3d4b60d8d04eeabfb1012886385
     </application>
 
 </manifest>

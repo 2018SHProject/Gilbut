@@ -171,6 +171,7 @@ public class TargetActivity extends AppCompatActivity {
                     target.setY_Id(null);
                     target.setStatus(-1);
                     target.setAlarm(false);
+                    Toast.makeText(getApplicationContext(), "NO_DATA", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -228,7 +229,13 @@ public class TargetActivity extends AppCompatActivity {
             public void onClick(View v) {
                 target.setAlarm(true);
                 //db에도 저장
-                Toast.makeText(getApplicationContext(),"보호자에게 알림을 보냅니다",Toast.LENGTH_SHORT).show();
+                connectionController.setAlarm(target.getM_Id(), target.getY_Id(), true, new ConnectionController.OnSetCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(getApplicationContext(),"보호자에게 알림을 보냅니다",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
 
@@ -237,7 +244,14 @@ public class TargetActivity extends AppCompatActivity {
             public void onClick(View v) {
                 target.setAlarm(false);
                 //db에도 저장
-                Toast.makeText(getApplicationContext(),"보호자에게 알림이 가지 않습니다",Toast.LENGTH_SHORT).show();
+
+                connectionController.setAlarm(target.getM_Id(), target.getY_Id(), false, new ConnectionController.OnSetCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(getApplicationContext(),"보호자에게 알림이 가지 않습니다",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
 
