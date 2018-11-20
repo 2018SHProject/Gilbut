@@ -67,7 +67,7 @@ public class TargetActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             init();                                                                 //제대로 들어왔는지 확인
             setting();                                                              //초기값 세팅
-            checkStatus();
+            // checkStatus(); 셋팅 안으로 넣음.
         }
     }
 
@@ -162,6 +162,7 @@ public class TargetActivity extends AppCompatActivity {
                 target.setY_Id(connection.pId);
                 target.setStatus(connection.status.intValue());
                 target.setAlarm(connection.alarm);
+                checkStatus();
         }
 
             @Override
@@ -173,6 +174,7 @@ public class TargetActivity extends AppCompatActivity {
                     target.setAlarm(false);
                     Toast.makeText(getApplicationContext(), "NO_DATA", Toast.LENGTH_LONG).show();
                 }
+                checkStatus();
             }
         });
         target.setM_Id(m_Id);
