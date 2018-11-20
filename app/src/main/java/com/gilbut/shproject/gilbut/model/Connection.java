@@ -21,4 +21,6 @@ public class Connection {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+
 }

@@ -188,6 +188,22 @@ public class ConnectionController {
         });
     }
 
+    public void getAlarm(String targetId, String protectorId, final OnGetAlarmListener onGetAlarmListener){
+        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Connection connection = dataSnapshot.getValue(Connection.class);
+                onGetAlarmListener.onComplete(connection.alarm);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public interface OnSetCompleteListener {
         public void onComplete();
     }
@@ -199,6 +215,11 @@ public class ConnectionController {
 
     public interface OnGetConnectionListener {
         public void onComplete(Connection connection);
+        public void onFailure();
+    }
+
+    public interface OnGetAlarmListener {
+        public void onComplete(boolean alarm);
         public void onFailure();
     }
 

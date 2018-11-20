@@ -1,4 +1,4 @@
-package com.gilbut.shproject.gilbut.model;
+package com.gilbut.shproject.gilbut;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

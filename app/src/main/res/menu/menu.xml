@@ -6,7 +6,7 @@
     <item
         android:id="@+id/setting"
         android:title="환경 설정"
-        android:icon="@drawble/ic_settings_black_24dp"
+        android:icon="@drawable/ic_launcher_foreground"
         
         />
 
