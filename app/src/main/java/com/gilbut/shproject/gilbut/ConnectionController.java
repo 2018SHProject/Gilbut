@@ -161,6 +161,7 @@ public class ConnectionController {
                         onGetConnectionListener.onComplete(connection);
                     }else {
                         onGetConnectionListener.onFailure("NO_DATA");
+                        break;
                     }
                 }
             }
