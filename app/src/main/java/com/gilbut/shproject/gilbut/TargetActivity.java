@@ -58,6 +58,10 @@ public class TargetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_target);
 
+        init();
+        checkStatus();
+
+
 
         if(ContextCompat.checkSelfPermission(this, String.valueOf(permission_list)) == PackageManager.PERMISSION_DENIED){
             checkPer();
@@ -67,7 +71,6 @@ public class TargetActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             init();                                                                 //제대로 들어왔는지 확인
             setting();                                                              //초기값 세팅
-            // checkStatus(); 셋팅 안으로 넣음.
         }
     }
 
@@ -230,6 +233,8 @@ public class TargetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 target.setAlarm(true);
+                onBtn.setVisibility(View.GONE);
+                offBtn.setVisibility(View.VISIBLE);
                 //db에도 저장
                 connectionController.setAlarm(target.getM_Id(), target.getY_Id(), true, new ConnectionController.OnSetCompleteListener() {
                     @Override
@@ -245,6 +250,8 @@ public class TargetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 target.setAlarm(false);
+                onBtn.setVisibility(View.VISIBLE);
+                offBtn.setVisibility(View.GONE);
                 //db에도 저장
 
                 connectionController.setAlarm(target.getM_Id(), target.getY_Id(), false, new ConnectionController.OnSetCompleteListener() {
