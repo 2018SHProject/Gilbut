@@ -4,23 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:gravity="center"
+    tools:context=".MainActivity">
 
-
-    <Button
-        android:text="target"
-        android:layout_height="wrap_content"
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/Google_Login"
         android:layout_width="match_parent"
-        android:id="@+id/btnT"/>
-
-    <Button
-        android:text="protector"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/btnP">
-
-    </Button>
-
+        android:layout_height="50sp">
+    </com.google.android.gms.common.SignInButton>
 
 </LinearLayout>
