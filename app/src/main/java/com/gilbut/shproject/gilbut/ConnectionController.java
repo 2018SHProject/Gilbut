@@ -131,7 +131,7 @@ public class ConnectionController {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                onGetCompleteListener.onFailure();
+                onGetCompleteListener.onFailure("CANCELLED");
             }
         });
     }
@@ -149,7 +149,7 @@ public class ConnectionController {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                onGetConnectionListener.onFailure();
+                onGetConnectionListener.onFailure("CANCELLED");
             }
         });
     }
@@ -163,12 +163,14 @@ public class ConnectionController {
                     Connection connection = targetSnapshot.getValue(Connection.class);
                     if (connection != null && connection.tId != null && connection.tId.equals(targetId)) {
                         onGetConnectionListener.onComplete(connection);
+                    }else {
+                        onGetConnectionListener.onFailure("NO_DATA");
                     }
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                onGetConnectionListener.onFailure();
+                onGetConnectionListener.onFailure("CANCELLED");
             }
         });
     }
@@ -210,17 +212,17 @@ public class ConnectionController {
 
     public interface OnGetCompleteListener {
         public void onComplete(int status);
-        public void onFailure();
+        public void onFailure(String err);
     }
 
     public interface OnGetConnectionListener {
         public void onComplete(Connection connection);
-        public void onFailure();
+        public void onFailure(String err);
     }
 
     public interface OnGetAlarmListener {
         public void onComplete(boolean alarm);
-        public void onFailure();
+        public void onFailure(String err);
     }
 
     public interface OnGetFailureListener {

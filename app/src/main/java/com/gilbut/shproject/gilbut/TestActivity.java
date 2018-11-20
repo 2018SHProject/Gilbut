@@ -56,15 +56,27 @@ public class TestActivity extends AppCompatActivity {
 //        });
 
         //getAlarm 에시
-        connectionController.getAlarm("target1", "protector1", new ConnectionController.OnGetAlarmListener() {
+//        connectionController.getAlarm("target1", "protector1", new ConnectionController.OnGetAlarmListener() {
+//            @Override
+//            public void onComplete(boolean status) {
+//                textView.setText(String.valueOf(status));
+//            }
+//
+//            @Override
+//            public void onFailure() {
+//
+//            }
+//        });
+
+        connectionController.getConnection("fff", new ConnectionController.OnGetConnectionListener() {
             @Override
-            public void onComplete(boolean status) {
-                textView.setText(String.valueOf(status));
+            public void onComplete(Connection connection) {
+                textView.setText(connection.pId);
             }
 
             @Override
-            public void onFailure() {
-
+            public void onFailure(String err) {
+                textView.setText(err);
             }
         });
     }
