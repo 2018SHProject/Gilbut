@@ -63,16 +63,16 @@ public class ConnectionController {
 //
 //            }
 //        });
-//        DatabaseReference targetRef = FirebaseDatabase.getInstance().getReference("target");
+//              DatabaseReference targetRef = FirebaseDatabase.getInstance().getReference("target");
 //        targetRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    if(snapshot.child("mID").getValue().toString().equals("jse525@naver.com")) {
-//                        int a = 123+ 23;
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                        if(snapshot.child("mID").getValue().toString().equals("jse525@naver.com")) {
+//
+//                        }
 //                    }
 //                }
-//            }
 //
 //            @Override
 //            public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -154,7 +154,39 @@ public class ConnectionController {
         });
     }
 
+    public void getConnection(final String targetId, final OnGetConnectionListener onGetConnectionListener){
+        DatabaseReference ref = db.getReference("connection");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot targetSnapshot: dataSnapshot.getChildren()) {
+                    Connection connection = targetSnapshot.getValue(Connection.class);
+                    if (connection != null && connection.tId != null && connection.tId.equals(targetId)) {
+                        onGetConnectionListener.onComplete(connection);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onGetConnectionListener.onFailure();
+            }
+        });
+    }
 
+    public void updateLocation(String targetId, String protectorId, double latitude, double longitude, final OnSetCompleteListener onUpdateCompleteListener){
+        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
+        Map<String, Object> locationUpdates = new HashMap<>();
+        locationUpdates.put("latitude", latitude);
+        locationUpdates.put("longitude", longitude);
+        ref.updateChildren(locationUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (onUpdateCompleteListener != null) {
+                    onUpdateCompleteListener.onComplete();
+                }
+            }
+        });
+    }
 
     public interface OnSetCompleteListener {
         public void onComplete();
