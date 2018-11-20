@@ -68,6 +68,7 @@ public class TestActivity extends AppCompatActivity {
 //            }
 //        });
 
+        // getConnection 타겟만 있을 떄 예시
         connectionController.getConnection("fff", new ConnectionController.OnGetConnectionListener() {
             @Override
             public void onComplete(Connection connection) {
@@ -77,6 +78,14 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public void onFailure(String err) {
                 textView.setText(err);
+            }
+        });
+
+        // setAlarm 예시
+        connectionController.setAlarm("target1", "protector1", true, new ConnectionController.OnSetCompleteListener() {
+            @Override
+            public void onComplete() {
+                textView.setText("흠");
             }
         });
     }

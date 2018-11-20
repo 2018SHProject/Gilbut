@@ -23,11 +23,7 @@ import java.util.Map;
 public class ConnectionController {
     //Connection
 
-    public FirebaseDatabase db;
-
-    ConnectionController() {
-        db = FirebaseDatabase.getInstance();
-    }
+    public FirebaseDatabase db= FirebaseDatabase.getInstance();
 
     public void updateConnectionStatus(String targetId, String protectorId, int status, @Nullable final OnSetCompleteListener onUpdateCompleteListener) {
         DatabaseReference ref = db.getReference("connection/" + targetId + "-" + protectorId);
@@ -185,6 +181,20 @@ public class ConnectionController {
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (onUpdateCompleteListener != null) {
                     onUpdateCompleteListener.onComplete();
+                }
+            }
+        });
+    }
+
+    public void setAlarm(String targetId, String protectorId, boolean alarm, final OnSetCompleteListener onSetCompleteListener){
+        DatabaseReference ref = db.getReference("connection");
+        String path = targetId + "-" + protectorId;
+
+        ref.child(path).child("alarm").setValue(alarm, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if(onSetCompleteListener!=null){
+                    onSetCompleteListener.onComplete();
                 }
             }
         });

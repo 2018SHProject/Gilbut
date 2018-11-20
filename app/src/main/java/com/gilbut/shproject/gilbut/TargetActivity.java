@@ -168,6 +168,7 @@ public class TargetActivity extends AppCompatActivity {
             public void onFailure(String err) {
                 if(err.equals("NO_DATA")){
                     // 연결이 없을 때.
+                    Toast.makeText(getApplicationContext(), "NO_DATA", Toast.LENGTH_LONG).show();
                 }
                 target.setY_Id(null);
                 target.setStatus(-1);
