@@ -168,10 +168,10 @@ public class TargetActivity extends AppCompatActivity {
             public void onFailure(String err) {
                 if(err.equals("NO_DATA")){
                     // 연결이 없을 때.
+                    target.setY_Id(null);
+                    target.setStatus(-1);
+                    target.setAlarm(false);
                 }
-                target.setY_Id(null);
-                target.setStatus(-1);
-                target.setAlarm(false);
             }
         });
         target.setM_Id(m_Id);
