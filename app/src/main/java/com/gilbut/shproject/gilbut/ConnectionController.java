@@ -1,12 +1,8 @@
 package com.gilbut.shproject.gilbut;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.gilbut.shproject.gilbut.model.Connection;
-import com.gilbut.shproject.gilbut.model.MemberData;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -14,9 +10,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -172,6 +168,36 @@ public class ConnectionController {
         });
     }
 
+    // protectorID로 연결이있는지 찾기
+    public void getConnections(final String protectorId, final OnGetConnectionsListener onGetConnectionsListener){
+        DatabaseReference ref = db.getReference("connection");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Connection> connections = new LinkedList<>();
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+
+                    Connection connection = snapshot.getValue(Connection.class);
+                    if(connection != null && connection.tId != null){
+                        connections.add(connection);
+                    }
+                }
+                onGetConnectionsListener.onComplete(connections);
+//                if(!connections.isEmpty()) {
+//                    onGetConnectionsListener.onComplete(connections);
+//                }else{
+//                    onGetConnectionsListener.onFailure("IS_EMPTY");
+//                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onGetConnectionsListener.onFailure(databaseError.toString());
+            }
+        });
+    }
+
+
     public void updateLocation(String targetId, String protectorId, double latitude, double longitude, final OnSetCompleteListener onUpdateCompleteListener){
         DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
         Map<String, Object> locationUpdates = new HashMap<>();
@@ -228,6 +254,11 @@ public class ConnectionController {
 
     public interface OnGetConnectionListener {
         public void onComplete(Connection connection);
+        public void onFailure(String err);
+    }
+
+    public interface OnGetConnectionsListener {
+        public void onComplete(List<Connection> connections);
         public void onFailure(String err);
     }
 

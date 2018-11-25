@@ -1,4 +1,7 @@
 package com.gilbut.shproject.gilbut.model;
+
+import java.util.List;
+
 public class Connection {
     public  Long status;
     public String tId;
@@ -8,6 +11,7 @@ public class Connection {
     public boolean alarm;
     public double latitude;
     public double longitude;
+    public List<Location> rangeList;
 
     public Connection(){}
 
