@@ -8,7 +8,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.gilbut.shproject.gilbut.model.Connection;
+import com.gilbut.shproject.gilbut.model.Location;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class TestActivity extends AppCompatActivity {
@@ -69,25 +71,53 @@ public class TestActivity extends AppCompatActivity {
 //        });
 
         // getConnection 타겟만 있을 떄 예시
-        connectionController.getConnection("fff", new ConnectionController.OnGetConnectionListener() {
+//        connectionController.getConnection("fff", new ConnectionController.OnGetConnectionListener() {
+//            @Override
+//            public void onComplete(Connection connection) {
+//                textView.setText(connection.pId);
+//            }
+//
+//            @Override
+//            public void onFailure(String err) {
+//                textView.setText(err);
+//            }
+//        });
+
+        // progector id로 연결 찾기.
+        connectionController.getConnections("protector1", new ConnectionController.OnGetConnectionsListener() {
             @Override
-            public void onComplete(Connection connection) {
-                textView.setText(connection.pId);
+            public void onComplete(List<Connection> connections) {
+                String str ="";
+                for(Connection connection : connections){
+                    str = str + " " + connection.rangeRef;
+                    Range range = new Range(connection.rangeRef, new Range.OnGetRangeListener() {
+                        @Override
+                        public void onComplete(List<Location> range) {
+                            textView.setText(""+range.get(0).getLatitude());
+                        }
+
+                        @Override
+                        public void onFailure(String err) {
+
+                        }
+                    });
+                }
+
             }
 
             @Override
             public void onFailure(String err) {
-                textView.setText(err);
+
             }
         });
 
         // setAlarm 예시
-        connectionController.setAlarm("target1", "protector1", true, new ConnectionController.OnSetCompleteListener() {
-            @Override
-            public void onComplete() {
-                textView.setText("흠");
-            }
-        });
+//        connectionController.setAlarm("target1", "protector1", true, new ConnectionController.OnSetCompleteListener() {
+//            @Override
+//            public void onComplete() {
+//                textView.setText("흠");
+//            }
+//        });
     }
 
 
