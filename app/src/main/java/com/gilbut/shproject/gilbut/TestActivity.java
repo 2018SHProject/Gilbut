@@ -2,14 +2,16 @@ package com.gilbut.shproject.gilbut;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gilbut.shproject.gilbut.model.Connection;
 import com.gilbut.shproject.gilbut.model.Location;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -17,6 +19,7 @@ public class TestActivity extends AppCompatActivity {
     TextView textView;
     Button btn;
     ConnectionController connectionController;
+    RangeController rangeController;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +29,7 @@ public class TestActivity extends AppCompatActivity {
     }
     public void btnClicked(View v) throws ExecutionException, InterruptedException {
         connectionController = new ConnectionController();
+        rangeController = new RangeController();
 
         textView.setText("잠시만 기다려주세요");
         //추가 예시
@@ -83,17 +87,21 @@ public class TestActivity extends AppCompatActivity {
 //            }
 //        });
 
-        // progector id로 연결 찾기.
+        // progector id로 연결 찾기. + range받아오기 예시.
         connectionController.getConnections("protector1", new ConnectionController.OnGetConnectionsListener() {
             @Override
             public void onComplete(List<Connection> connections) {
                 String str ="";
                 for(Connection connection : connections){
                     str = str + " " + connection.rangeRef;
-                    Range range = new Range(connection.rangeRef, new Range.OnGetRangeListener() {
+                    RangeController rangeController = new RangeController(connection.rangeRef, new RangeController.OnGetRangeListener() {
                         @Override
                         public void onComplete(List<Location> range) {
-                            textView.setText(""+range.get(0).getLatitude());
+                            if(range.isEmpty()){
+                                textView.setText("no range");
+                            }else {
+                                textView.setText("" + range.get(0).getLatitude());
+                            }
                         }
 
                         @Override
@@ -110,6 +118,23 @@ public class TestActivity extends AppCompatActivity {
 
             }
         });
+
+        // RangeController setting 예시
+//        ArrayList<Location> newRange = new ArrayList<Location>();
+//        newRange.add(new Location(34.555, 188.444));
+//        newRange.add(new Location(33.555, 188.444));
+//        newRange.add(new Location(37.555, 180.9));
+//        rangeController.addRange(newRange, new RangeController.OnSetRangeListener() {
+//            @Override
+//            public void onComplete(String rangeRef) {
+//                textView.setText(rangeRef);
+//            }
+//
+//            @Override
+//            public void onFailure(String err) {
+//                Toast.makeText(TestActivity.this, err, Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         // setAlarm 예시
 //        connectionController.setAlarm("target1", "protector1", true, new ConnectionController.OnSetCompleteListener() {

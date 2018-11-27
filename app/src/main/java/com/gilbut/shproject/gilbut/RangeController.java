@@ -1,7 +1,12 @@
 package com.gilbut.shproject.gilbut;
 
+import android.support.annotation.NonNull;
+
 import com.gilbut.shproject.gilbut.model.Location;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -9,19 +14,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Range {
+public class RangeController {
     public  ArrayList<Location> range;
 
-    public Range(){}
+    public RangeController(){}
 
-    public Range(ArrayList<Location> range){
+    public RangeController(ArrayList<Location> range){
         this.range = range;
     }
 
-    public Range(final String rangeRef, final OnGetRangeListener onGetRangeListener){
+    public RangeController(final String rangeRef, final OnGetRangeListener onGetRangeListener){
         range = new ArrayList<>();
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference(rangeRef);
@@ -68,14 +74,47 @@ public class Range {
     }
 
     // TODO: 레인지 추가하는거 만들어야되는데.. 음..
-    public void addRange(ArrayList<Location> range) {
+    public void addRange(ArrayList<Location> range, final OnSetRangeListener setRangeListener) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
-        DatabaseReference ref = db.getReference("range");
-        //ArrayList<>
+        DatabaseReference ref = db.getReference("range").push();
+        ArrayList<Map<String, Double>> mapRange = new ArrayList<>();
+        for(Location location : range){
+            HashMap<String, Double> pos = new HashMap<>();
+            pos.put("latitude", location.getLatitude());
+            pos.put("longitude", location.getLongitude());
+            mapRange.add(pos);
+        }
+        final String uid = ref.getKey();
+        ref.setValue(mapRange).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                setRangeListener.onComplete("range/"+uid);
+            }
+        });
     }
 
-    public void updateRange(ArrayList<Location> range) {
-
+    public void updateRange(ArrayList<Location> range, final OnSetRangeListener setRangeListener) {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference ref = db.getReference("range").push();
+        ArrayList<Map<String, Double>> mapRange = new ArrayList<>();
+        for(Location location : range){
+            HashMap<String, Double> pos = new HashMap<>();
+            pos.put("latitude", location.getLatitude());
+            pos.put("longitude", location.getLongitude());
+            mapRange.add(pos);
+        }
+        final String uid = ref.getKey();
+        ref.setValue(mapRange).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                setRangeListener.onComplete("range/"+uid);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                setRangeListener.onFailure(e.toString());
+            }
+        });
     }
 
     public interface OnGetRangeListener {
@@ -84,7 +123,7 @@ public class Range {
     }
 
     public interface OnSetRangeListener {
-        public void onComplete();
+        public void onComplete(String rangeRef);
         public void onFailure(String err);
     }
 }
