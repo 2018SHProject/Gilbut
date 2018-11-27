@@ -1,14 +1,5 @@
 package com.gilbut.shproject.gilbut.model;
 
-import com.gilbut.shproject.gilbut.Range;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.GenericTypeIndicator;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class Connection {
     public  Long status;
     public String tId;

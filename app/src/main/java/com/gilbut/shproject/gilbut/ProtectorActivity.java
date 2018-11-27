@@ -41,6 +41,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+
 import static com.gilbut.shproject.gilbut.R.id;
 import static com.gilbut.shproject.gilbut.R.layout;
 
@@ -201,15 +203,16 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         if(resultCode == setting_Result){
             //setting 화면에서 돌아왔을 때
             //Toast.makeText(this,"범위를 생성/수정 하였습니다",Toast.LENGTH_LONG).show();
-            Range latLngs = (Range)getIntent().getSerializableExtra("setting");
-            if(latLngs != null) {
-//                Toast.makeText(this,"Latlng 넘어옴" +
-//                                latLngs.range.get(0).latitude + ", " +latLngs.range.get(0).longitude
-//                        ,Toast.LENGTH_LONG).show();
 
-//                printMap(latLngs.range.get(0).latitude,latLngs.range.get(0).longitude);
+            Intent i = getIntent();
+            //RangeController latLngs = bundle.getParcelable("setting");
+            ArrayList<LatLng> latLngs = data.getParcelableArrayListExtra("setting");
+            if(latLngs != null) {
+                Toast.makeText(this,"Latlng 넘어옴"  ,Toast.LENGTH_LONG).show();
+
+                printMap(latLngs.get(0).latitude,latLngs.get(0).longitude);
                 PolygonOptions polygonOptions = new PolygonOptions();
-  //              polygonOptions.addAll(latLngs.range);
+               polygonOptions.addAll(latLngs);
                 polygonOptions.strokeWidth(15);
                 polygonOptions.strokeColor(Color.rgb(255, 203, 81));
                 Polygon polygon = map.addPolygon(polygonOptions);
@@ -218,6 +221,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
                 Toast.makeText(this,"Latlng 안 넘어옴",Toast.LENGTH_LONG).show();
 
             }
+            Toast.makeText(this,data.getStringExtra("test"), Toast.LENGTH_LONG).show();
 
         }
         else if(resultCode == 2){
