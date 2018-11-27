@@ -3,13 +3,16 @@ package com.gilbut.shproject.gilbut;
 import android.support.annotation.Nullable;
 
 import com.gilbut.shproject.gilbut.model.Connection;
+import com.gilbut.shproject.gilbut.model.Location;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -77,7 +80,7 @@ public class ConnectionController {
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time = transFormat.format(date);
         DatabaseReference ref = db.getReference("connection");
-        Connection newConnection = new Connection((long) status, targetId, protectorId, time, "", true, 37.502340, 127.019027 );
+        Connection newConnection = new Connection((long) status, targetId, protectorId,  "", time,  true, 37.502340, 127.019027 );
         String path = targetId + "-" + protectorId;
 
         ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {
@@ -96,7 +99,7 @@ public class ConnectionController {
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time = transFormat.format(date);
         DatabaseReference ref = db.getReference("connection");
-        Connection newConnection = new Connection((long) status, targetId, protectorId, time, "", true, latitude, longitude );
+        Connection newConnection = new Connection((long) status, targetId, protectorId, "", time,  true, latitude, longitude );
         String path = targetId + "-" + protectorId;
 
         ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {
@@ -176,18 +179,12 @@ public class ConnectionController {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Connection> connections = new LinkedList<>();
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-
                     Connection connection = snapshot.getValue(Connection.class);
                     if(connection != null && connection.tId != null){
                         connections.add(connection);
                     }
                 }
                 onGetConnectionsListener.onComplete(connections);
-//                if(!connections.isEmpty()) {
-//                    onGetConnectionsListener.onComplete(connections);
-//                }else{
-//                    onGetConnectionsListener.onFailure("IS_EMPTY");
-//                }
             }
 
             @Override
