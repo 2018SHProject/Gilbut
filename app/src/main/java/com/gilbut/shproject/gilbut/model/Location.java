@@ -4,7 +4,9 @@ public class Location {
     double latitude;
     double longitude;
 
-    Location(double latitude, double longitude){
+    public Location(){}
+
+    public  Location(double latitude, double longitude){
         this.latitude = latitude;
         this.longitude = longitude;
     }
