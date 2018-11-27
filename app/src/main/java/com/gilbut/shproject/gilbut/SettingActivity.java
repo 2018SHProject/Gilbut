@@ -1,6 +1,7 @@
 package com.gilbut.shproject.gilbut;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -98,6 +99,13 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
                 polygonOptions.strokeWidth(15);
                 polygonOptions.strokeColor(Color.rgb(255,203,81));
                 polygon = map.addPolygon(polygonOptions);
+
+                Range range = new Range(arrayPoints);
+                Intent result = new Intent();
+                result.putExtra("setting", range);
+                //1 대신 범위 정보
+                setResult(1,result);
+                finish();
             }
         });
 

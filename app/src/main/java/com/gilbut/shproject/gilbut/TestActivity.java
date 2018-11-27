@@ -2,13 +2,12 @@ package com.gilbut.shproject.gilbut;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.gilbut.shproject.gilbut.model.Connection;
-import com.gilbut.shproject.gilbut.model.Location;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -92,8 +91,8 @@ public class TestActivity extends AppCompatActivity {
                     str = str + " " + connection.rangeRef;
                     Range range = new Range(connection.rangeRef, new Range.OnGetRangeListener() {
                         @Override
-                        public void onComplete(List<Location> range) {
-                            textView.setText(""+range.get(0).getLatitude());
+                        public void onComplete(List<LatLng> range) {
+                            textView.setText(""+range.get(0).latitude);
                         }
 
                         @Override

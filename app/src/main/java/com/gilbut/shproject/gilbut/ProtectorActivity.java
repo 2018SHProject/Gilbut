@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +33,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,6 +45,8 @@ import static com.gilbut.shproject.gilbut.R.id;
 import static com.gilbut.shproject.gilbut.R.layout;
 
 public class ProtectorActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
+
+    final int setting_Result = 1;
 
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
@@ -187,7 +192,38 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     void openSetting(){
 
         Intent intent = new Intent(getApplicationContext(),SettingActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, setting_Result);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == setting_Result){
+            //setting 화면에서 돌아왔을 때
+            //Toast.makeText(this,"범위를 생성/수정 하였습니다",Toast.LENGTH_LONG).show();
+            Range latLngs = (Range)getIntent().getSerializableExtra("setting");
+            if(latLngs != null) {
+//                Toast.makeText(this,"Latlng 넘어옴" +
+//                                latLngs.range.get(0).latitude + ", " +latLngs.range.get(0).longitude
+//                        ,Toast.LENGTH_LONG).show();
+
+//                printMap(latLngs.range.get(0).latitude,latLngs.range.get(0).longitude);
+                PolygonOptions polygonOptions = new PolygonOptions();
+  //              polygonOptions.addAll(latLngs.range);
+                polygonOptions.strokeWidth(15);
+                polygonOptions.strokeColor(Color.rgb(255, 203, 81));
+                Polygon polygon = map.addPolygon(polygonOptions);
+            }
+            else{
+                Toast.makeText(this,"Latlng 안 넘어옴",Toast.LENGTH_LONG).show();
+
+            }
+
+        }
+        else if(resultCode == 2){
+            // 로그인에서 넘어왔을 때
+
+        }
     }
 
     @Override
@@ -228,7 +264,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     }
 
     public void printMap(double lat, double lng){
-        final LatLng Loc = new LatLng(latitude, longitude);
+        final LatLng Loc = new LatLng(lat, lng);
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
 
         // 여기서 범위 이탈 체크하고 알림 주기
