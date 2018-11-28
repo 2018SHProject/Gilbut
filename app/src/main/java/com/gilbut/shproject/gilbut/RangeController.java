@@ -75,7 +75,6 @@ public class RangeController{
         });
     }
 
-    // TODO: 레인지 추가하는거 만들어야되는데.. 음..
     public void addRange(ArrayList<LatLng> range, final OnSetRangeListener setRangeListener) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference("range").push();

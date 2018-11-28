@@ -82,31 +82,67 @@ public class TestActivity extends AppCompatActivity {
 //            }
 //        });
 
-        // progector id로 연결 찾기.
-        connectionController.getConnections("protector1", new ConnectionController.OnGetConnectionsListener() {
+        // progector id로 연결 찾기. + range 받아오기
+//        connectionController.getConnections("protector1", new ConnectionController.OnGetConnectionsListener() {
+//            @Override
+//            public void onComplete(List<Connection> connections) {
+//                String str ="";
+//                for(Connection connection : connections){
+//                    str = str + " " + connection.location;
+//                      // range 받아오기
+////                    RangeController range = new RangeController(connection.rangeRef, new RangeController.OnGetRangeListener() {
+////                        @Override
+////                        public void onComplete(List<LatLng> range) {
+////                            textView.setText(""+range.get(0).latitude);
+////                        }
+////
+////                        @Override
+////                        public void onFailure(String err) {
+////
+////                        }
+////                    });
+//                    textView.setText(str);
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onFailure(String err) {
+//
+//            }
+//        });
+
+        // RangeController setting 예시
+        RangeController rangeController;
+//        ArrayList<Location> newRange = new ArrayList<Location>();
+//        newRange.add(new Location(34.555, 188.444));
+//        newRange.add(new Location(33.555, 188.444));
+//        newRange.add(new Location(37.555, 180.9));
+//        rangeController.addRange(newRange, new RangeController.OnSetRangeListener() {
+//            @Override
+//            public void onComplete(String rangeRef) {
+//                textView.setText(rangeRef);
+//            }
+//
+//            @Override
+//            public void onFailure(String err) {
+//                Toast.makeText(TestActivity.this, err, Toast.LENGTH_SHORT).show();
+//            }
+//        });
+
+        // 연결 정보 검사.
+//        connectionController.setObserveConnectionStatus("target1", "protector1", new ConnectionController.OnObservedDataChange() {
+//            @Override
+//            public void OnDataChange(Object object) {
+//                textView.setText(object.toString());
+//            }
+//        });
+
+        //위치 변화 검사.
+        connectionController.setObserveLocation("target1", "protector1", new ConnectionController.OnObservedDataChange() {
             @Override
-            public void onComplete(List<Connection> connections) {
-                String str ="";
-                for(Connection connection : connections){
-                    str = str + " " + connection.rangeRef;
-                    RangeController range = new RangeController(connection.rangeRef, new RangeController.OnGetRangeListener() {
-                        @Override
-                        public void onComplete(List<LatLng> range) {
-                            textView.setText(""+range.get(0).latitude);
-                        }
-
-                        @Override
-                        public void onFailure(String err) {
-
-                        }
-                    });
-                }
-
-            }
-
-            @Override
-            public void onFailure(String err) {
-
+            public void OnDataChange(Object object) {
+                textView.setText(object.toString());
             }
         });
 
