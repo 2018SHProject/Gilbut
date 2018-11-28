@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -70,6 +71,10 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     LinearLayout dialview;
     Toast toast;
     TextView textView;
+
+    ListView listView;
+    ArrayList<Target> targets;
+    TargetListAdapter arrayAdapter;
 
     @Override
     protected void onStart() {
@@ -262,9 +267,13 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         toastview  = getLayoutInflater().inflate(layout.connection_toast, (ViewGroup) findViewById(id.toast_costum));
         textView = (TextView)toastview.findViewById(id.connection_toast);
 
+        listView = (ListView)findViewById(id.TargetList);
+        targets = new ArrayList<Target>();
+        targets.add(new Target());
+        //나와 연결된 타겟들 받아와서 추가하기
 
-
-
+        arrayAdapter = new TargetListAdapter(this, layout.target_list, targets);
+        listView.setAdapter(arrayAdapter);
     }
 
     public void printMap(double lat, double lng){
