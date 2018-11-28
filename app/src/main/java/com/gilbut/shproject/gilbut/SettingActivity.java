@@ -100,12 +100,15 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
                 polygonOptions.strokeColor(Color.rgb(255,203,81));
                 polygon = map.addPolygon(polygonOptions);
 
-                Range range = new Range(arrayPoints);
+                RangeController range = new RangeController(arrayPoints);
                 Intent result = new Intent();
-                result.putExtra("setting", range);
+                //result.putExtra("setting", range);
+                result.putExtra("setting", arrayPoints);
+                result.putExtra("test", "test");
                 //1 대신 범위 정보
                 setResult(1,result);
                 finish();
+                //startActivity(result);
             }
         });
 

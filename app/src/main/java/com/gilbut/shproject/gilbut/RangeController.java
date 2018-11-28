@@ -1,9 +1,10 @@
 package com.gilbut.shproject.gilbut;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.gilbut.shproject.gilbut.model.Location;
-import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -18,12 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RangeController {
-    public  ArrayList<Location> range;
+public class RangeController{
+    public ArrayList<LatLng> range;
 
     public RangeController(){}
 
-    public RangeController(ArrayList<Location> range){
+    public RangeController(ArrayList<LatLng> range){
         this.range = range;
     }
 
@@ -35,9 +36,9 @@ public class RangeController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot rangeSnapshot : dataSnapshot.getChildren()){
-                    Location location = rangeSnapshot.getValue(Location.class);
-                    if(location != null ){
-                        range.add(location);
+                    LatLng latLng = rangeSnapshot.getValue(LatLng.class);
+                    if(latLng != null ){
+                        range.add(latLng);
                     }
                 }
                 onGetRangeListener.onComplete(range);
@@ -51,16 +52,17 @@ public class RangeController {
 
     }
 
+
     public void getRange(String rangeRef, final OnGetRangeListener onGetRangeListener) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference(rangeRef);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot locationSnapshot : dataSnapshot.getChildren()){
-                    Location location = locationSnapshot.getValue(Location.class);
-                    if(location != null){
-                        range.add(location);
+                for(DataSnapshot latlngSnapshot : dataSnapshot.getChildren()){
+                    LatLng latLng = latlngSnapshot.getValue(LatLng.class);
+                    if(latLng != null){
+                        range.add(latLng);
                     }
                 }
                 onGetRangeListener.onComplete(range);
@@ -74,14 +76,14 @@ public class RangeController {
     }
 
     // TODO: 레인지 추가하는거 만들어야되는데.. 음..
-    public void addRange(ArrayList<Location> range, final OnSetRangeListener setRangeListener) {
+    public void addRange(ArrayList<LatLng> range, final OnSetRangeListener setRangeListener) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference("range").push();
         ArrayList<Map<String, Double>> mapRange = new ArrayList<>();
-        for(Location location : range){
+        for(LatLng latLng : range){
             HashMap<String, Double> pos = new HashMap<>();
-            pos.put("latitude", location.getLatitude());
-            pos.put("longitude", location.getLongitude());
+            pos.put("latitude", latLng.latitude);
+            pos.put("longitude", latLng.longitude);
             mapRange.add(pos);
         }
         final String uid = ref.getKey();
@@ -93,14 +95,14 @@ public class RangeController {
         });
     }
 
-    public void updateRange(ArrayList<Location> range, final OnSetRangeListener setRangeListener) {
+    public void updateRange(ArrayList<LatLng> range, final OnSetRangeListener setRangeListener) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference("range").push();
         ArrayList<Map<String, Double>> mapRange = new ArrayList<>();
-        for(Location location : range){
+        for(LatLng latLng : range){
             HashMap<String, Double> pos = new HashMap<>();
-            pos.put("latitude", location.getLatitude());
-            pos.put("longitude", location.getLongitude());
+            pos.put("latitude", latLng.latitude);
+            pos.put("longitude",latLng.longitude);
             mapRange.add(pos);
         }
         final String uid = ref.getKey();
@@ -118,7 +120,7 @@ public class RangeController {
     }
 
     public interface OnGetRangeListener {
-        public void onComplete(List<Location> range);
+        public void onComplete(List<LatLng> range);
         public void onFailure(String err);
     }
 
