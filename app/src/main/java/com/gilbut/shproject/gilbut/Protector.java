@@ -26,12 +26,12 @@ public class Protector {
     void PsetisConnected(int isConnected){this.status = isConnected;};
     void PsetAlarmcheck(boolean alarm){this.alarm = alarm;};
     void PsetList(List<LatLng> latLngs){this.latlngs = latLngs;};
-    void PsetPolyline(){};
+    void PsetPolygon(){};
 
     String PgetmId(){return mId;};
     String PgetyId(){return yId;};
     int PgetisConnected(){return status;};
     boolean PgetAlarmcheck(){return alarm;};
-    // PgetPolyline(){}
+    //Polygon PgetPolygon(){return null;}
     List<LatLng> PgetList(){return latlngs;};
 }

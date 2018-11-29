@@ -1,24 +1,25 @@
 package com.gilbut.shproject.gilbut;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.gilbut.shproject.gilbut.model.Connection;
-import com.gilbut.shproject.gilbut.model.MemberData;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ConnectionController {
     //Connection
@@ -81,7 +82,7 @@ public class ConnectionController {
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time = transFormat.format(date);
         DatabaseReference ref = db.getReference("connection");
-        Connection newConnection = new Connection((long) status, targetId, protectorId, time, "", true, 37.502340, 127.019027 );
+        Connection newConnection = new Connection((long) status, targetId, protectorId,  "", time,  true, 37.502340, 127.019027 );
         String path = targetId + "-" + protectorId;
 
         ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {
@@ -100,7 +101,7 @@ public class ConnectionController {
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time = transFormat.format(date);
         DatabaseReference ref = db.getReference("connection");
-        Connection newConnection = new Connection((long) status, targetId, protectorId, time, "", true, latitude, longitude );
+        Connection newConnection = new Connection((long) status, targetId, protectorId, "", time,  true, latitude, longitude );
         String path = targetId + "-" + protectorId;
 
         ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {
@@ -172,6 +173,32 @@ public class ConnectionController {
         });
     }
 
+    // protectorID로 연결이있는지 찾기
+    public void getConnections(final String protectorId, final OnGetConnectionsListener onGetConnectionsListener){
+        DatabaseReference ref = db.getReference("connection");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<Connection> connections = new ArrayList<>();
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Connection connection = snapshot.getValue(Connection.class);
+                    if(connection != null && connection.pId !=null){
+                        if(Objects.equals(connection.pId, protectorId)) {
+                            connections.add(connection);
+                        }
+                    }
+                }
+                onGetConnectionsListener.onComplete(connections);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onGetConnectionsListener.onFailure(databaseError.toString());
+            }
+        });
+    }
+
+
     public void updateLocation(String targetId, String protectorId, double latitude, double longitude, final OnSetCompleteListener onUpdateCompleteListener){
         DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
         Map<String, Object> locationUpdates = new HashMap<>();
@@ -207,7 +234,28 @@ public class ConnectionController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Connection connection = dataSnapshot.getValue(Connection.class);
-                onGetAlarmListener.onComplete(connection.alarm);
+                if(connection != null) {
+                    onGetAlarmListener.onComplete(connection.alarm);
+                }
+                else{
+                    onGetAlarmListener.onFailure("NULL");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onGetAlarmListener.onFailure(databaseError.toString());
+            }
+        });
+    }
+
+    public void setObserveConnectionStatus(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
+        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId).child("status");
+        ValueEventListener valueEventListener = ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int status =  ((Long)dataSnapshot.getValue()).intValue();
+                onObservedDataChange.OnDataChange(status);
             }
 
             @Override
@@ -216,6 +264,24 @@ public class ConnectionController {
             }
         });
     }
+
+    public void setObserveLocation(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
+        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
+        ValueEventListener latitudeEventListener = ref.child("location").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Double latitude = dataSnapshot.child("latitude").getValue(Double.class);
+                Double longitude = dataSnapshot.child("longitude").getValue(Double.class);
+                onObservedDataChange.OnDataChange(new LatLng(latitude, longitude));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
     public interface OnSetCompleteListener {
         public void onComplete();
@@ -231,12 +297,17 @@ public class ConnectionController {
         public void onFailure(String err);
     }
 
+    public interface OnGetConnectionsListener {
+        public void onComplete(List<Connection> connections);
+        public void onFailure(String err);
+    }
+
     public interface OnGetAlarmListener {
         public void onComplete(boolean alarm);
         public void onFailure(String err);
     }
 
-    public interface OnGetFailureListener {
-
+    public interface OnObservedDataChange{
+        public void OnDataChange(Object object);
     }
 }

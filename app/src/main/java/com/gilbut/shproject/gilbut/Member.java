@@ -25,6 +25,8 @@ public class Member {
         uemail = mAuth.getCurrentUser().getEmail();
         db = FirebaseDatabase.getInstance();
     }
+
+    //TODO:멤버 검사하는 함수가 있어야 될것 같다.
     public boolean isMember() {
         return isMem;
     }
