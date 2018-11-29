@@ -16,7 +16,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.gilbut.shproject.gilbut.model.Connection;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -40,6 +40,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -61,6 +62,8 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     ChildEventListener childEventListener;
     // Firebase DB 임시 설정
 
+    ConnectionController connectionController;
+
     Protector protector;
 
     SupportMapFragment mapFragment;
@@ -78,7 +81,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     TextView textView;
 
     ListView listView;
-    ArrayList<Target> targets;
+    ArrayList<Connection> connections;
     TargetListAdapter arrayAdapter;
 
     // 우용 추가
@@ -108,8 +111,8 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_protector);
-        Toolbar toolbar = (Toolbar) findViewById(id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(id.toolbar);
+//        setSupportActionBar(toolbar);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED){
             checkPer();
@@ -261,6 +264,9 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     public void init(){
 
         protector = new Protector();
+        protector.mId = FirebaseAuth.getInstance().getUid();
+        protector.status = 1;
+        connectionController = new ConnectionController();
 
         mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -284,11 +290,26 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         textView = (TextView)toastview.findViewById(id.connection_toast);
 
         listView = (ListView)findViewById(id.TargetList);
-        targets = new ArrayList<Target>();
-        targets.add(new Target());
+
+
+        connections = new ArrayList<Connection>();
+        connectionController.getConnections(protector.mId, new ConnectionController.OnGetConnectionsListener() {
+            @Override
+            public void onComplete(ArrayList<Connection> connection) {
+                connections.addAll(connection);
+                // 모가 문제일까요
+            }
+
+            @Override
+            public void onFailure(String err) {
+
+            }
+        });
+
+
         //나와 연결된 타겟들 받아와서 추가하기
 
-        arrayAdapter = new TargetListAdapter(this, layout.target_list, targets);
+        arrayAdapter = new TargetListAdapter(this, layout.target_list, connections);
         listView.setAdapter(arrayAdapter);
     }
 

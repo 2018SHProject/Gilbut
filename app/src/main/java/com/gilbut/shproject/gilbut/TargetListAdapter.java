@@ -10,14 +10,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.gilbut.shproject.gilbut.model.Connection;
+
 import java.util.ArrayList;
 
-public class TargetListAdapter extends ArrayAdapter<Target> {
-    ArrayList<Target> list;
+public class TargetListAdapter extends ArrayAdapter<Connection> {
+    ArrayList<Connection> list;
     Button button;
     Context context;
-    public TargetListAdapter( Context context, int resource,  ArrayList<Target> objects) {
+    public TargetListAdapter( Context context, int resource,  ArrayList<Connection> objects) {
         super(context, resource, objects);
+
         this.list = objects;
         this.context = context;
     }
@@ -32,18 +35,18 @@ public class TargetListAdapter extends ArrayAdapter<Target> {
 
         }
 
-        Target target = list.get(position);
-        if(target != null){
+        Connection connection = list.get(position);
+        if(connection != null){
             TextView tid = (TextView)v.findViewById(R.id.target_id);
             TextView tpos = (TextView)v.findViewById(R.id.target_pos);
 
 
             if(tid == null){
-                tid.setText(target.getM_Id());
+                tid.setText(connection.tId);
 
             }
             if(tpos == null){
-                tpos.setText(target.getLatitude() + " + " + target.getLongitude());
+                tpos.setText(connection.location.toString());
             }
         }
 

@@ -6,10 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.gilbut.shproject.gilbut.model.Connection;
-import com.google.android.gms.maps.model.LatLng;
-
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class TestActivity extends AppCompatActivity {
@@ -81,8 +77,8 @@ public class TestActivity extends AppCompatActivity {
 //                textView.setText(err);
 //            }
 //        });
-
-        // progector id로 연결 찾기. + range 받아오기
+//
+//         progector id로 연결 찾기. + range 받아오기
 //        connectionController.getConnections("protector1", new ConnectionController.OnGetConnectionsListener() {
 //            @Override
 //            public void onComplete(List<Connection> connections) {
