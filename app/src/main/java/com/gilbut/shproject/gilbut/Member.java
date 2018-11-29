@@ -16,7 +16,7 @@ import java.util.Map;
 public class Member {
     private FirebaseAuth mAuth;
     private FirebaseDatabase db;
-    private boolean isMem;
+    public boolean isMem;
     private String uid, uemail;
 
     public Member() { // Member 객체 생성자를 호출하면 자동 DB 검사해서 ID 없으면 putMember
@@ -27,8 +27,28 @@ public class Member {
     }
 
     //TODO:멤버 검사하는 함수가 있어야 될것 같다.
-    public boolean isMember() {
-        return isMem;
+    //TODO:멤버 검사하는 Listener 달기!
+    public void isMember(final String id) {
+        DatabaseReference targetRef = db.getReference("target");
+        targetRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    if(snapshot.child("mId").getValue().toString().equals(id+"@gmail.com")) {
+                        Log.d("isMember()", snapshot.child("mId").getValue().toString());
+                        yesMem();
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+    private void yesMem() {
+        Log.d("MemMem", "YESMEM");
+        isMem = true;
     }
 
     // DB에 내 uid에 해당하는 테이블이 없으면 내 정보를 대상, 보호자 DB에 넣음
@@ -44,7 +64,6 @@ public class Member {
                     if (snapshot.getKey().equals(uid)) {
                         Log.d("target", snapshot.getKey());
                         put_this = true;
-                        isMem = true;
                     }
                 }
                 if(!put_this) {
@@ -93,4 +112,5 @@ public class Member {
         protectorRef2.child(uid).child("mId").setValue(protectorValues.get("mId"));
         protectorRef2.child(uid).child("yId").setValue(targetValues.get("yId"));
     }
+
 }
