@@ -1,10 +1,14 @@
 package com.gilbut.shproject.gilbut;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -41,6 +45,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 
@@ -75,6 +80,17 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     ListView listView;
     ArrayList<Target> targets;
     TargetListAdapter arrayAdapter;
+
+    // 우용 추가
+    LatLng me; // 내 위치정보 저장
+    LocationManager locationManager;
+    String[] permission_list={
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.READ_PHONE_STATE
+    };
+
+
 
     @Override
     protected void onStart() {
@@ -374,4 +390,34 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
 
     }
+
+
+    //우용 추가
+    LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            double lat = location.getLatitude();                                  //위도 받아오기
+            double lng = location.getLongitude();                                //경도 받아오기
+            me = new LatLng(lat, lng);
+        }
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+    };
+    public double distfromTarget(Target target) {
+        ContextCompat.checkSelfPermission(this, String.valueOf(permission_list));
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER,5000,10, locationListener );
+        locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER,5000,10, locationListener );
+        LatLng target_latlng = new LatLng(target.getLatitude(), target.getLongitude());
+
+        return (SphericalUtil.computeDistanceBetween(me, target_latlng));
+    }
+
 }
