@@ -40,6 +40,7 @@ public class TargetActivity extends AppCompatActivity {
     Intent intent;
     Button onBtn;                                                               //위치전송 on 버튼
     Button offBtn;                                                              //위치전송 off 버튼
+    Button eBtn;                                                                //긴급버튼
     TextView noProtector;                                                       //연결된 보호자가 없을 때 띄울 메세지
     TextView tWait;                                                             //보호자의 수락을 기다릴 때 보일 메세지.
     FloatingActionButton fab;                                                   //Fab
@@ -90,6 +91,7 @@ public class TargetActivity extends AppCompatActivity {
         target = new Target();
         onBtn = (Button)findViewById(R.id.tAlarmOn);
         offBtn = (Button)findViewById(R.id.tAlarmOff);
+        eBtn = (Button)findViewById(R.id.emergencyBtn);
         noProtector = (TextView)findViewById(R.id.noProtector);
         tWait = (TextView)findViewById(R.id.tWait);
         fab = (FloatingActionButton)findViewById(R.id.fab);
@@ -112,10 +114,15 @@ public class TargetActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //파베에 새로운 연결 생성.
-                        String y_Id = editText.getText().toString();
-                        target.setY_Id(y_Id);
-                        // (대상 id, 보호자 id, status, 성공시 콜백-OnSetCompleteListener)
-                        connectionController.addNewConnection(target.getM_Id(), target.getY_Id(), 0, new ConnectionController.OnSetCompleteListener() {
+                        String p_Id = editText.getText().toString();
+                        //TODO p_id (대상이 연결을 원하는 보호자의 아이디)를 입력받아서, 즉 target id랑 protector Id를 입력받아서 connection list에 있는지를 확인.
+                        //있으면 이미 요청된 거라고 알람을 띄우고 없으면 아래 로직 진행. 그리고 y_id필요없댔으니까 get_id로만.
+
+
+
+//                        target.setY_Id(y_Id);
+//                         (대상 id, 보호자 id, status, 성공시 콜백-OnSetCompleteListener)
+                        connectionController.addNewConnection(target.get_Id(), p_Id, 0, new ConnectionController.OnSetCompleteListener() {
                             @Override
                             public void onComplete() {
                                 //새로운 연결 생성 완료.
@@ -124,8 +131,6 @@ public class TargetActivity extends AppCompatActivity {
                         });
 
                         target.setStatus(0);
-
-                        //바로 이전의 키값을 저장하고 있다고 할까? (db에 적용), 그러면 새로 넣을 경우에 이전 키값을 지워버리면 되잖아!
                         dialog.dismiss();
                     }
                 });
@@ -147,22 +152,20 @@ public class TargetActivity extends AppCompatActivity {
             //checkMod가 대상모드로 제대로 선택돼서 들어왔을 경우 그냥 넘어감
         }
         else{
-            Toast.makeText(getApplicationContext(),"값이 잘못되었습니다",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"진입 값이 잘못되었습니다",Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
     public void setting(){
-
         String m_Id = intent.getStringExtra("mId");
 
         //m_id로 연결db에서 정보들을 가져와 y_id, status를 초기화한다.
         connectionController = new ConnectionController();
-
+        //TODO m_id를 입력받아서 연결된 모든 정보를 받아와야함. (보호자 리스트)
         connectionController.getConnection(m_Id, new ConnectionController.OnGetConnectionListener() {
             @Override
             public void onComplete(Connection connection) {
-                target.setY_Id(connection.pId);
                 target.setStatus(connection.status.intValue());
                 target.setAlarm(connection.alarm);
                 checkStatus();
@@ -172,7 +175,6 @@ public class TargetActivity extends AppCompatActivity {
             public void onFailure(String err) {
                 if(err.equals("NO_DATA")){
                     // 연결이 없을 때.
-                    target.setY_Id(null);
                     target.setStatus(-1);
                     target.setAlarm(false);
                     Toast.makeText(getApplicationContext(), "NO_DATA", Toast.LENGTH_LONG).show();
@@ -180,8 +182,6 @@ public class TargetActivity extends AppCompatActivity {
                 checkStatus();
             }
         });
-        target.setM_Id(m_Id);
-
     }
 
 
@@ -191,6 +191,7 @@ public class TargetActivity extends AppCompatActivity {
         onBtn.setVisibility(View.GONE);
         offBtn.setVisibility(View.GONE);
         tWait.setVisibility(View.GONE);
+        eBtn.setVisibility(View.GONE);
         noProtector.setVisibility(View.GONE);
         fab.show();
         if(status == 1){
@@ -201,10 +202,7 @@ public class TargetActivity extends AppCompatActivity {
         }
         else if(status == 0){
             //연결 요청 후 보류상태.
-            //아니면 계속 새로 보낼 수 있게 만들어! (Floating action button)
-            //그러면 이전의 보낸 메세지는 무효화되게 만들어야함!.
             tWait.setVisibility(View.VISIBLE);
-            fab.hide();
         }
         else if(status == -1){
             //아무것도 아닌 경우
@@ -215,12 +213,14 @@ public class TargetActivity extends AppCompatActivity {
             showRefused();
         }
         else {
-            Toast.makeText(getApplicationContext(),"값이 잘못되었습니다",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Status 값이 잘못되었습니다",Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
     public void showToggle(){
+        eBtn.setVisibility(View.VISIBLE);
+
         if(target.getAlarm()){                          //만약 alarm을 켜 놓은 경우라면?
             onBtn.setVisibility(View.GONE);
             offBtn.setVisibility(View.VISIBLE);
@@ -235,13 +235,14 @@ public class TargetActivity extends AppCompatActivity {
                 target.setAlarm(true);
                 onBtn.setVisibility(View.GONE);
                 offBtn.setVisibility(View.VISIBLE);
+                //TODO 아래 controller꼴처럼, 기존에는 y_id도 집어넣었었는데 없애주라!
                 //db에도 저장
-                connectionController.setAlarm(target.getM_Id(), target.getY_Id(), true, new ConnectionController.OnSetCompleteListener() {
-                    @Override
-                    public void onComplete() {
-                        Toast.makeText(getApplicationContext(),"보호자에게 알림을 보냅니다",Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                connectionController.setAlarm(target.get_Id(), true, new ConnectionController.OnSetCompleteListener() {
+//                    @Override
+//                    public void onComplete() {
+//                        Toast.makeText(getApplicationContext(),"보호자에게 알림을 보냅니다",Toast.LENGTH_SHORT).show();
+//                    }
+//                });
 
             }
         });
@@ -254,12 +255,21 @@ public class TargetActivity extends AppCompatActivity {
                 offBtn.setVisibility(View.GONE);
                 //db에도 저장
 
-                connectionController.setAlarm(target.getM_Id(), target.getY_Id(), false, new ConnectionController.OnSetCompleteListener() {
-                    @Override
-                    public void onComplete() {
-                        Toast.makeText(getApplicationContext(),"보호자에게 알림이 가지 않습니다",Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                connectionController.setAlarm(target.get_Id(),false, new ConnectionController.OnSetCompleteListener() {
+//                    @Override
+//                    public void onComplete() {
+//                        Toast.makeText(getApplicationContext(),"보호자에게 알림이 가지 않습니다",Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+
+            }
+        });
+
+        eBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                target.setEmergency(true);
+                //TODO emergency를 true로! 그리고 보호자에서 확인했으면 false로 바꿔야함
 
             }
         });
@@ -280,13 +290,13 @@ public class TargetActivity extends AppCompatActivity {
         //연결요청을 거부당했다는 팝업을 띄운다.
         target.setStatus(-1);
         noProtector.setVisibility(View.VISIBLE);
-
-        connectionController.updateConnectionStatus(target.getM_Id(), target.getY_Id(), -1, new ConnectionController.OnSetCompleteListener() {
-            @Override
-            public void onComplete() {
-                Toast.makeText(getApplicationContext(),"연결 요청이 거절당했습니다.",Toast.LENGTH_SHORT).show();
-            }
-        });
+        //TODO 이것도 마찬가지로 Y_id를 빼줘
+//        connectionController.updateConnectionStatus(target.get_Id(), -1, new ConnectionController.OnSetCompleteListener() {
+//            @Override
+//            public void onComplete() {
+//                Toast.makeText(getApplicationContext(),"연결 요청이 거절당했습니다.",Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
 
@@ -299,13 +309,13 @@ public class TargetActivity extends AppCompatActivity {
             target.setLocation(latitude,longitude);                             //target에 저장
             //db에도 저장
 
-
-            connectionController.updateLocation(target.getM_Id(), target.getY_Id(), latitude, longitude, new ConnectionController.OnSetCompleteListener() {
-                @Override
-                public void onComplete() {
-                                Toast.makeText(getApplicationContext(),"위도 " +latitude+" 경도 "+ longitude,Toast.LENGTH_SHORT).show();
-                }
-            });
+            //TODO 이것도 마찬가지로 Y_ID 빼줘!
+//            connectionController.updateLocation(target.get_Id(), latitude, longitude, new ConnectionController.OnSetCompleteListener() {
+//                @Override
+//                public void onComplete() {
+//                                Toast.makeText(getApplicationContext(),"위도 " +latitude+" 경도 "+ longitude,Toast.LENGTH_SHORT).show();
+//                }
+//            });
 
         }
 

@@ -25,21 +25,43 @@
         android:gravity="center"
         android:text="보호자의 수락을 기다리는 중입니다."
         android:visibility="gone"/>
-    <Button
-        android:id="@+id/tAlarmOn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="위치전송 ON"
-        android:visibility="gone" />
 
-    <Button
-        android:id="@+id/tAlarmOff"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="위치전송 OFF"
-        android:visibility="gone"/>
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/tAlarmOn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="위치전송 ON"
+            android:visibility="gone"
+            android:layout_margin="20dp"/>
+
+        <Button
+            android:id="@+id/tAlarmOff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="위치전송 OFF"
+            android:visibility="gone"
+            android:layout_margin="20dp"/>
+
+        <Button
+            android:id="@+id/emergencyBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="긴급 버튼"
+            android:visibility="gone"
+            android:layout_margin="20dp"/>
+
+
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
