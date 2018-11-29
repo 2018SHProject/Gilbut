@@ -35,6 +35,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-identity:12.0.1'
     implementation 'com.google.android.gms:play-services:12.0.1'
     implementation 'com.google.firebase:firebase-database:12.0.1'
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
 }
 
 apply plugin: 'com.google.gms.google-services'
