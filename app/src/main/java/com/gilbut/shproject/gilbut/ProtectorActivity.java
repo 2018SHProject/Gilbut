@@ -40,7 +40,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -263,8 +262,12 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
     public void init(){
 
+        Intent intent = getIntent();
+
         protector = new Protector();
-        protector.mId = FirebaseAuth.getInstance().getUid();
+        //protector.mId = intent.getStringExtra("mId");
+        protector.mId = "tazozzang";
+        Toast.makeText(this, protector.mId, Toast.LENGTH_SHORT).show();
         protector.status = 1;
         connectionController = new ConnectionController();
 
