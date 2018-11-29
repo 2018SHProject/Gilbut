@@ -249,39 +249,6 @@ public class ConnectionController {
         });
     }
 
-    public void setObserveConnectionStatus(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
-        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId).child("status");
-        ValueEventListener valueEventListener = ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                int status =  ((Long)dataSnapshot.getValue()).intValue();
-                onObservedDataChange.OnDataChange(status);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    public void setObserveLocation(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
-        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
-        ValueEventListener latitudeEventListener = ref.child("location").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Double latitude = dataSnapshot.child("latitude").getValue(Double.class);
-                Double longitude = dataSnapshot.child("longitude").getValue(Double.class);
-                onObservedDataChange.OnDataChange(new LatLng(latitude, longitude));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
 
     public interface OnSetCompleteListener {
         public void onComplete();
@@ -305,9 +272,5 @@ public class ConnectionController {
     public interface OnGetAlarmListener {
         public void onComplete(boolean alarm);
         public void onFailure(String err);
-    }
-
-    public interface OnObservedDataChange{
-        public void OnDataChange(Object object);
     }
 }

@@ -139,7 +139,8 @@ public class TestActivity extends AppCompatActivity {
 //        });
 
         //위치 변화 검사.
-        connectionController.setObserveLocation("target1", "protector1", new ConnectionController.OnObservedDataChange() {
+        Observer statusObserver = new Observer();
+        statusObserver.setObservingLocation("target1", "protector1", new Observer.OnObservedDataChange() {
             @Override
             public void OnDataChange(Object object) {
                 textView.setText(object.toString());
