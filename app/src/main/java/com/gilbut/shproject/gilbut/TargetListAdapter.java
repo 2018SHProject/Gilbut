@@ -25,7 +25,7 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
         this.context = context;
     }
 
-    public View getView(int position, View view , ViewGroup parent){
+    public View getView(int position, View view , final ViewGroup parent){
         View v = view;
         if(v== null){
             LayoutInflater vi =
@@ -41,12 +41,12 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
             TextView tpos = (TextView)v.findViewById(R.id.target_pos);
 
 
-            if(tid == null){
+            if(tid != null){
                 tid.setText(connection.tId);
 
             }
-            if(tpos == null){
-                tpos.setText(connection.location.toString());
+            if(tpos != null){
+                tpos.setText(connection.location.get("latitude").toString() + ", " +connection.location.get("longitude").toString());
             }
         }
 
@@ -54,8 +54,9 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, SettingActivity.class);
-                ((Activity)context).startActivityForResult(intent, 1);
+                Intent intent = new Intent(parent.getContext(), SettingActivity.class);
+                ((Activity)parent.getContext()).startActivityForResult(intent, 1);
+                //Toast.makeText(context, "?", Toast.LENGTH_LONG).show();
             }
         });
         return v;

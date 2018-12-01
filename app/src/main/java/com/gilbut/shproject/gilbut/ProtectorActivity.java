@@ -17,8 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,6 +90,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             Manifest.permission.READ_PHONE_STATE
     };
 
+    Context Pcontext;
 
 
     @Override
@@ -110,8 +109,8 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_protector);
-//        Toolbar toolbar = (Toolbar) findViewById(id.toolbar);
-//        setSupportActionBar(toolbar);
+        Pcontext = getApplication();
+
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED){
             checkPer();
@@ -205,14 +204,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         );
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu, menu);
-
-        return true;
-    }
 
     void openSetting(){
 
@@ -245,10 +236,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
             }
             Toast.makeText(this,data.getStringExtra("test"), Toast.LENGTH_LONG).show();
-
-        }
-        else if(resultCode == 2){
-            // 로그인에서 넘어왔을 때
 
         }
     }
@@ -300,6 +287,9 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             @Override
             public void onComplete(ArrayList<Connection> connection) {
                 connections.addAll(connection);
+
+                arrayAdapter = new TargetListAdapter(Pcontext, layout.target_list, connections);
+                listView.setAdapter(arrayAdapter);
                 // 모가 문제일까요
             }
 
@@ -312,8 +302,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
         //나와 연결된 타겟들 받아와서 추가하기
 
-        arrayAdapter = new TargetListAdapter(this, layout.target_list, connections);
-        listView.setAdapter(arrayAdapter);
     }
 
     public void printMap(double lat, double lng){

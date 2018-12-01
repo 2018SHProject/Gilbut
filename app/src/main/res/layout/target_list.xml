@@ -13,7 +13,6 @@
             <TextView
                 android:padding="16dp"
                 android:textSize="10pt"
-                android:text="dlwldus718"
                 android:id="@+id/target_id"
                 />
         </TableRow>
@@ -22,7 +21,6 @@
                 android:paddingLeft="16pt"
                 android:id="@+id/target_pos"
                 android:textSize="9pt"
-                android:text="서울시 광진구 어쩌구"
                 />
         </TableRow>
 

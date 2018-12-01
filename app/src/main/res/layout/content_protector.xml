@@ -26,7 +26,7 @@
     <ListView
         android:id="@+id/TargetList"
         android:layout_width="match_parent"
-        android:layout_height="150dp">
+        android:layout_height="200dp">
 
     </ListView>
 </LinearLayout>
