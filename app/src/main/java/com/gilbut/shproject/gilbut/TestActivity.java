@@ -5,7 +5,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.gilbut.shproject.gilbut.model.Connection;
+import com.gilbut.shproject.gilbut.model.TargetMember;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class TestActivity extends AppCompatActivity {
@@ -79,41 +86,42 @@ public class TestActivity extends AppCompatActivity {
 //        });
 //
 //         progector id로 연결 찾기. + range 받아오기
-//        connectionController.getConnections("protector1", new ConnectionController.OnGetConnectionsListener() {
-//            @Override
-//            public void onComplete(List<Connection> connections) {
-//                String str ="";
-//                for(Connection connection : connections){
-//                    str = str + " " + connection.location;
-//                      // range 받아오기
-////                    RangeController range = new RangeController(connection.rangeRef, new RangeController.OnGetRangeListener() {
-////                        @Override
-////                        public void onComplete(List<LatLng> range) {
-////                            textView.setText(""+range.get(0).latitude);
-////                        }
+//        connectionController.getConnections("protector1", new ConnectionController.OnGetConnectionsListener()
+////        {
+////            @Override
+////            public void onComplete(ArrayList<Connection> connections) {
+////                String str ="";
+////                for(Connection connection : connections){
+////                    str = str + " " + connection.location;
+////                      // range 받아오기
+//////                    RangeController range = new RangeController(connection.rangeRef, new RangeController.OnGetRangeListener() {
+//////                        @Override
+//////                        public void onComplete(List<LatLng> range) {
+//////                            textView.setText(""+range.get(0).latitude);
+//////                        }
+//////
+//////                        @Override
+//////                        public void onFailure(String err) {
+//////
+//////                        }
+//////                    });
+////                    textView.setText(str);
+////                }
 ////
-////                        @Override
-////                        public void onFailure(String err) {
+////            }
 ////
-////                        }
-////                    });
-//                    textView.setText(str);
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(String err) {
-//
-//            }
-//        });
+////            @Override
+////            public void onFailure(String err) {
+////
+////            }
+////        });
 
         // RangeController setting 예시
-        RangeController rangeController;
-//        ArrayList<Location> newRange = new ArrayList<Location>();
-//        newRange.add(new Location(34.555, 188.444));
-//        newRange.add(new Location(33.555, 188.444));
-//        newRange.add(new Location(37.555, 180.9));
+//        RangeController rangeController = new RangeController();
+//        ArrayList<LatLng> newRange = new ArrayList<LatLng>();
+//        newRange.add(new LatLng(34.555, 188.444));
+//        newRange.add(new LatLng(33.555, 188.444));
+//        newRange.add(new LatLng(37.555, 180.9));
 //        rangeController.addRange(newRange, new RangeController.OnSetRangeListener() {
 //            @Override
 //            public void onComplete(String rangeRef) {
@@ -126,29 +134,36 @@ public class TestActivity extends AppCompatActivity {
 //            }
 //        });
 
-        // 연결 정보 검사.
-//        connectionController.setObserveConnectionStatus("target1", "protector1", new ConnectionController.OnObservedDataChange() {
+        //위치 변화 검사.
+//        Observer statusObserver = new Observer();
+//        statusObserver.setObservingLocation("target1", "protector1", new Observer.OnObservedDataChange() {
 //            @Override
 //            public void OnDataChange(Object object) {
 //                textView.setText(object.toString());
 //            }
 //        });
 
-        //위치 변화 검사.
-        Observer statusObserver = new Observer();
-        statusObserver.setObservingLocation("target1", "protector1", new Observer.OnObservedDataChange() {
-            @Override
-            public void OnDataChange(Object object) {
-                textView.setText(object.toString());
-            }
-        });
+        // 타겟 정보 가져오기.
+      Member member = new Member();
+//        member.getTarget("jse52595@gmail.com", new Member.OnGetTargetListener() {
+//            @Override
+//            public void onGetData(TargetMember target) {
+//                textView.setText(""+target.getLocation());
+//            }
+//        });
 
         // setAlarm 예시
-//        connectionController.setAlarm("target1", "protector1", true, new ConnectionController.OnSetCompleteListener() {
+//        member.setAlarm("jse52595@gmail.com",  true, new Member.OnSetCompleteListener() {
 //            @Override
 //            public void onComplete() {
 //                textView.setText("흠");
 //            }
+//
+//            @Override
+//            public void onFailure(String err) {
+//
+//            }
+//
 //        });
     }
 

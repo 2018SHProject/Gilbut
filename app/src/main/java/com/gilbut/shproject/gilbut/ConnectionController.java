@@ -35,78 +35,38 @@ public class ConnectionController {
         });
     }
 
+    //새로운 연결 추가.
     public void addNewConnection(final String targetId, final String protectorId, final int status, @Nullable final OnSetCompleteListener onSetCompleteListener) {
 //        // 이미 있는 보호자인지 검사.
-//        DatabaseReference protectorRef = db.getReference("protector");
-//        protectorRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                for(DataSnapshot protectorSnapshot : dataSnapshot.getChildren()) {
-//                    MemberData protector = protectorSnapshot.getValue(MemberData.class);
-//                    if(protector != null &&protectorId.equals(protector.getmId())){
-//
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//              DatabaseReference targetRef = FirebaseDatabase.getInstance().getReference("target");
-//        targetRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                    for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                        if(snapshot.child("mID").getValue().toString().equals("jse525@naver.com")) {
-//
-//                        }
-//                    }
-//                }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-
-        long now = System.currentTimeMillis();
-        Date date = new Date(now);
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String time = transFormat.format(date);
-        DatabaseReference ref = db.getReference("connection");
-        Connection newConnection = new Connection((long) status, targetId, protectorId,  "", time,  true, 37.502340, 127.019027 );
-        String path = targetId + "-" + protectorId;
-
-        ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {
+        Member member = new Member();
+        member.isProtector(protectorId, new Member.OnCheckMemberListener() {
             @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if(onSetCompleteListener!=null){
-                    onSetCompleteListener.onComplete();
-                }
+            public void onComplete(boolean isMember) {
+                long now = System.currentTimeMillis();
+                Date date = new Date(now);
+                SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String time = transFormat.format(date);
+                DatabaseReference ref = db.getReference("connection");
+                Connection newConnection = new Connection((long) status, targetId, protectorId,  "", time,  true, 37.502340, 127.019027 );
+                String path = targetId + "-" + protectorId;
+
+                ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        if(onSetCompleteListener!=null){
+                            onSetCompleteListener.onComplete();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(){
+                // 보호자가 없어서 실패..
+                onSetCompleteListener.onFailure("보호자가 없습니다!");
             }
         });
-    }
 
-    public void addNewConnection(final String targetId, final String protectorId, final int status, final double latitude, final double longitude, @Nullable final OnSetCompleteListener onSetCompleteListener) {
-        long now = System.currentTimeMillis();
-        Date date = new Date(now);
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String time = transFormat.format(date);
-        DatabaseReference ref = db.getReference("connection");
-        Connection newConnection = new Connection((long) status, targetId, protectorId, "", time,  true, latitude, longitude );
-        String path = targetId + "-" + protectorId;
-
-        ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if(onSetCompleteListener!=null){
-                    onSetCompleteListener.onComplete();
-                }
-            }
-        });
     }
 
 
@@ -134,9 +94,7 @@ public class ConnectionController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Connection connection = dataSnapshot.getValue(Connection.class);
-                if(connection != null){
-                    onGetConnectionListener.onComplete(connection);
-                }
+                onGetConnectionListener.onComplete(connection);
             }
 
             @Override
@@ -146,7 +104,7 @@ public class ConnectionController {
         });
     }
 
-    public void getConnection(final String targetId, final OnGetConnectionListener onGetConnectionListener){
+    public void getConnections(final String targetId, final OnGetConnectionListener onGetConnectionListener){
         DatabaseReference ref = db.getReference("connection");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -193,60 +151,9 @@ public class ConnectionController {
         });
     }
 
-
-    public void updateLocation(String targetId, String protectorId, double latitude, double longitude, final OnSetCompleteListener onUpdateCompleteListener){
-        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
-        Map<String, Object> locationUpdates = new HashMap<>();
-        locationUpdates.put("latitude", latitude);
-        locationUpdates.put("longitude", longitude);
-        ref.updateChildren(locationUpdates, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (onUpdateCompleteListener != null) {
-                    onUpdateCompleteListener.onComplete();
-                }
-            }
-        });
-    }
-
-    public void setAlarm(String targetId, String protectorId, boolean alarm, final OnSetCompleteListener onSetCompleteListener){
-        DatabaseReference ref = db.getReference("connection");
-        String path = targetId + "-" + protectorId;
-
-        ref.child(path).child("alarm").setValue(alarm, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if(onSetCompleteListener!=null){
-                    onSetCompleteListener.onComplete();
-                }
-            }
-        });
-    }
-
-    public void getAlarm(String targetId, String protectorId, final OnGetAlarmListener onGetAlarmListener){
-        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Connection connection = dataSnapshot.getValue(Connection.class);
-                if(connection != null) {
-                    onGetAlarmListener.onComplete(connection.alarm);
-                }
-                else{
-                    onGetAlarmListener.onFailure("NULL");
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                onGetAlarmListener.onFailure(databaseError.toString());
-            }
-        });
-    }
-
-
     public interface OnSetCompleteListener {
         public void onComplete();
+        public void onFailure(String err);
     }
 
     public interface OnGetCompleteListener {
@@ -261,11 +168,6 @@ public class ConnectionController {
 
     public interface OnGetConnectionsListener {
         public void onComplete(ArrayList<Connection> connections);
-        public void onFailure(String err);
-    }
-
-    public interface OnGetAlarmListener {
-        public void onComplete(boolean alarm);
         public void onFailure(String err);
     }
 }

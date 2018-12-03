@@ -23,6 +23,8 @@ package com.gilbut.shproject.gilbut;
 
         import com.gilbut.shproject.gilbut.model.Connection;
 
+        import java.util.ArrayList;
+
 //대상이 보호자에게 연결요청, 이 후 보호자가 대상에게 위치정보요청
 //status 설명
 //-1 : nothing
@@ -128,6 +130,11 @@ public class TargetActivity extends AppCompatActivity {
                                 //새로운 연결 생성 완료.
                                 Toast.makeText(getApplicationContext(), "요청완료", Toast.LENGTH_SHORT).show();
                             }
+
+                            @Override
+                            public void onFailure(String err) {
+
+                            }
                         });
 
                         target.setStatus(0);
@@ -162,12 +169,13 @@ public class TargetActivity extends AppCompatActivity {
 
         //m_id로 연결db에서 정보들을 가져와 y_id, status를 초기화한다.
         connectionController = new ConnectionController();
-        //TODO m_id를 입력받아서 연결된 모든 정보를 받아와야함. (보호자 리스트)
-        connectionController.getConnection(m_Id, new ConnectionController.OnGetConnectionListener() {
+        //TODO m_id를 입력받아서 연결된 모든 정보를 받아와야함. (보호자 리스트) => 수정
+        connectionController.getConnections(m_Id, new ConnectionController.OnGetConnectionsListener() {
             @Override
-            public void onComplete(Connection connection) {
-                target.setStatus(connection.status.intValue());
-                target.setAlarm(connection.alarm);
+            public void onComplete(ArrayList<Connection> connection) {
+                // connection 내부에 연결여부 들어있음.
+//                target.setStatus(connection.status.intValue());
+////                target.setAlarm(connection.alarm);
                 checkStatus();
         }
 
