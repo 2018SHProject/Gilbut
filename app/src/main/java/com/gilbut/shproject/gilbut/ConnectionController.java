@@ -37,6 +37,75 @@ public class ConnectionController {
         });
     }
 
+    public void updateConnection(String targetId, String protectorId, int status, String rangeRef, boolean prevent, @Nullable final OnSetCompleteListener onUpdateCompleteListener){
+        DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = transFormat.format(date);
+        Connection connectionUpdates = new Connection((long) status, targetId, protectorId, rangeRef, time, prevent);
+        ref.setValue(connectionUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                onUpdateCompleteListener.onComplete();
+            }
+        });
+    }
+
+    public void updateConnectionPrevent(final String targetId, final String protectorId, final boolean prevent, @Nullable final OnSetCompleteListener onUpdateCompleteListener){
+        final DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Connection connection = dataSnapshot.getValue(Connection.class);
+                long now = System.currentTimeMillis();
+                Date date = new Date(now);
+                SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String time = transFormat.format(date);
+                Connection connectionUpdates = new Connection((long) connection.status, targetId, protectorId, connection.rangeRef, time, prevent);
+                ref.setValue(connectionUpdates, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        onUpdateCompleteListener.onComplete();
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void updateConnectionRangeReference(final String targetId, final String protectorId, final String rangeRef, @Nullable final OnSetCompleteListener onUpdateCompleteListener){
+        final DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Connection connection = dataSnapshot.getValue(Connection.class);
+                long now = System.currentTimeMillis();
+                Date date = new Date(now);
+                SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String time = transFormat.format(date);
+                Connection connectionUpdates = new Connection((long) connection.status, targetId, protectorId, rangeRef, time, connection.prevent);
+                ref.setValue(connectionUpdates, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        onUpdateCompleteListener.onComplete();
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
     //새로운 연결 추가.
     public void addNewConnection(final String targetId, final String protectorId, final int status, @Nullable final OnSetCompleteListener onSetCompleteListener) {
 //        // 이미 있는 보호자인지 검사.
@@ -49,7 +118,7 @@ public class ConnectionController {
                 SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String time = transFormat.format(date);
                 DatabaseReference ref = db.getReference("connection");
-                Connection newConnection = new Connection((long) status, targetId, protectorId,  "", time );
+                Connection newConnection = new Connection((long) status, targetId, protectorId,  "", time , false);
                 String path = targetId.replace(".","")+"-"+protectorId.replace(".","");
 
                 ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {

@@ -11,18 +11,11 @@ public class Connection {
     public String pId;
     public String date;
     public String rangeRef;
+    public boolean prevent;
 
     public Connection(){}
 
-    public Connection(Long status, String tId, String pId, String rangeRef, String date){
-        this.status = status;
-        this.tId = tId;
-        this.pId = pId;
-        this.date = date;
-        this.rangeRef = rangeRef;
-    }
-
-    public Connection(Long status, String tId, String pId, String rangeRef, String date, boolean alarm, LatLng location){
+    public Connection(Long status, String tId, String pId, String rangeRef, String date, boolean prevent){
         this.status = status;
         this.tId = tId;
         this.pId = pId;
