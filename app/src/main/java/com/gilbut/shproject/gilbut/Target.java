@@ -8,6 +8,7 @@ public class Target {
     private double longitude;                                           //경도
     private Boolean alarm;                                              //보호자에게가는 알람서비스 on/off
     private Boolean emergency;                                          //긴급알람
+
     //private long key;
 
 
@@ -19,6 +20,7 @@ public class Target {
         alarm = true;
         emergency = false;
     }
+
 
     public void set_Id(String id){this.id=id;}
     public void setStatus(int status){this.status = status;}

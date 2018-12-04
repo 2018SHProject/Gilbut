@@ -34,13 +34,14 @@ package com.gilbut.shproject.gilbut;
 //1 : 모든 연결 완료
 //2 : 보호자가 거절 (이 후 -1로 변경)
 
-//checkStatus를 주기적으로 실행할? 아니면 status값에 대한 변동이 일어나면 실행을!
+
 
 public class TargetActivity extends AppCompatActivity {
 
     ConnectionController connectionController;
     LocationManager locationManager;
     Target target;                                                              //대상 유저 클래스
+    Member member;
     Intent intent;
     Button onBtn;                                                               //위치전송 on 버튼
     Button offBtn;                                                              //위치전송 off 버튼
@@ -50,6 +51,13 @@ public class TargetActivity extends AppCompatActivity {
     FloatingActionButton fab;                                                   //Fab
     double latitude;
     double longitude;
+    ArrayList<Connection> plist;                                                //연결된 보호자 리스트
+
+    int statuss;                                                                //연결상태
+
+    //-1 : 연결이 아예 없는 경우
+    //0 : 커넥션은 있으나(요청은 보냈으나) 어느 누구하고도 연결되지 않은 경우
+    //1 ; 한명이라도 연결된 경우
 
     String[] permission_list={
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -63,11 +71,6 @@ public class TargetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_target);
 
-        init();
-        checkStatus();
-
-
-
         if(ContextCompat.checkSelfPermission(this, String.valueOf(permission_list)) == PackageManager.PERMISSION_DENIED){
             checkPer();
             // 퍼미션 허용
@@ -76,6 +79,7 @@ public class TargetActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             init();                                                                 //제대로 들어왔는지 확인
             setting();                                                              //초기값 세팅
+            checkConnection();
         }
     }
 
@@ -100,6 +104,9 @@ public class TargetActivity extends AppCompatActivity {
         tWait = (TextView)findViewById(R.id.tWait);
         fab = (FloatingActionButton)findViewById(R.id.fab);
         connectionController = new ConnectionController();
+        member = new Member();
+        plist = new ArrayList<>();
+        statuss = -1;
 
         // Auth를 이용해서 아이디 받아오기.
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -131,7 +138,7 @@ public class TargetActivity extends AppCompatActivity {
                             public void onComplete(Connection connection) {
                                 //연결 존재.
                                 if (connection != null) {
-                                    //TODO: @동현. 이미 연결 있다고 알림 띄우기. 일단 내가 임시로 토스트로 걸어둠. 원하는대로 바꾸세요.
+
                                     Toast.makeText(getApplicationContext(), "이미 연결된 보호자입니다!", Toast.LENGTH_LONG).show();
                                 } else { // 연결 없음. -> 새로 연결 생성.
                                     connectionController.addNewConnection(target.get_Id(), p_Id, 0, new ConnectionController.OnSetCompleteListener() {
@@ -146,7 +153,7 @@ public class TargetActivity extends AppCompatActivity {
                                                 public void OnDataChange(Object object) {
                                                     int status = (int)object;
                                                     if(status == 3){ // 보호자가 거절했을 때.
-                                                        showRefused();
+//                                                        showRefused();
 
                                                         statusObserver.removeObserver();
                                                     }
@@ -204,14 +211,30 @@ public class TargetActivity extends AppCompatActivity {
         connectionController.geTargetConnections(m_Id, new ConnectionController.OnGetConnectionsListener() {
             @Override
             public void onComplete(ArrayList<Connection> connections) {
-                //TODO: @동현 targetId로 connections(ArrayList<Connection>) 정보 받오는거 해뒀음. 밑에 for문에서 처리하면 될것.
+
+                boolean check = false;
                 for(Connection connection : connections){
-                    String protector = connection.pId; // 보호자 아이디 꺼내기 예시.
+                    plist.add(connection);
+                    if(!check) {
+                        if (connection.status.intValue() == 1) {
+                            statuss = 1;
+                            check = true;
+                        }
+                    }
+                    if(connection.status.intValue() == 2){
+                        String pid = connection.pId;
+                        showRefused(pid);
+                        //1명 대기중인데 그게 거절인경우. 그러면 그거를 showrefused에서 pid에 해당하는 status를 -1로 바꾸고, statuss를 -1로 바꿔야되는데
+                        //그거를 어떻게 판별하지? TODO 이건 내가 고민하는거임 @동현.
+                    }
+
                 }
-                // connection 내부에 연결여부 들어있음.
-//                target.setStatus(connection.status.intValue());
-////                target.setAlarm(connection.alarm);
-                checkStatus();
+
+                if(statuss != 1)            //연결은 있으나 완료가 되지 않은 경우(어느 누구와도)
+                    statuss = 0;
+
+                //TODO @동현 리스트 띄우기
+                checkConnection();
         }
 
             @Override
@@ -219,46 +242,36 @@ public class TargetActivity extends AppCompatActivity {
                 if(err.equals("NO_DATA")){
                     // 연결이 없을 때.
                     target.setStatus(-1);
+                    statuss = -1;
                     target.setAlarm(false);
                     Toast.makeText(getApplicationContext(), "NO_DATA", Toast.LENGTH_LONG).show();
                 }
-                checkStatus();
+                checkConnection();
             }
         });
     }
 
-    //TODO:  이 함수 수정하는게 좋을것 같습니다. n:m 상황에서 못쓸것 같습니다.
-    public void checkStatus(){
+    public void checkConnection(){
         //status를 확인해서 각각 상황에 맞는 작업을 수행한다.
-        int status = target.getStatus();
+//        int status = target.getStatus();
         onBtn.setVisibility(View.GONE);
         offBtn.setVisibility(View.GONE);
         tWait.setVisibility(View.GONE);
         eBtn.setVisibility(View.GONE);
         noProtector.setVisibility(View.GONE);
         fab.show();
-        //TODO: location보내는건 토글버튼 로케이션 보내게 설정되어있을때 연결 정보랑 상관없이 계속 보내느게 좋을거 같음.
-        if(status == 1){
-            //연결이 완료되어있는경우
+        setLocation();
+
+        if(statuss == 1) {
+            //연결이 완료되어있는 경우
             showToggle();
-            fab.hide();
-            //토글 띄우고 지속적으로 location 서버전송
-        }
-        else if(status == 0){
-            //연결 요청 후 보류상태.
+        }else if(statuss == 0){
+            //어느 누구와도 연결이 되지 않은 경우
             tWait.setVisibility(View.VISIBLE);
-        }
-        else if(status == -1){
-            //아무것도 아닌 경우
+        }else if (statuss == -1){
+            //연결 자체가 없는 경우
             noProtector.setVisibility(View.VISIBLE);
-        }
-        else if(status == 2){
-            //거절당한경우
-            showRefused();
-        }
-        else {
-            //TODO: 이거 처음에 연결정보 없어서 null 뜰수 있어서 status -1처럼 처리해야될거같은데.
-            noProtector.setVisibility(View.VISIBLE);
+        }else{
             Toast.makeText(getApplicationContext(),"Status 값이 잘못되었습니다",Toast.LENGTH_SHORT).show();
             //finish();
         }
@@ -281,9 +294,6 @@ public class TargetActivity extends AppCompatActivity {
                 target.setAlarm(true);
                 onBtn.setVisibility(View.GONE);
                 offBtn.setVisibility(View.VISIBLE);
-                //TODO  @동현: 수정 완료. alarm은 기존 connection에 저장하다가 target에 저장하는걸로 바꿨음. 그에 맞게 변화.
-                //db에도 저장
-                Member member = new Member();
                 member.setAlarm(target.get_Id(), true, new Member.OnSetCompleteListener() {
                     @Override
                     public void onComplete() {
@@ -292,7 +302,7 @@ public class TargetActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(String err) {
-
+                        Toast.makeText(getApplicationContext(),"BtnOn 실패",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -304,15 +314,18 @@ public class TargetActivity extends AppCompatActivity {
                 target.setAlarm(false);
                 onBtn.setVisibility(View.VISIBLE);
                 offBtn.setVisibility(View.GONE);
-                //db에도 저장
 
-//                connectionController.setAlarm(target.get_Id(),false, new ConnectionController.OnSetCompleteListener() {
-//                    @Override
-//                    public void onComplete() {
-//                        Toast.makeText(getApplicationContext(),"보호자에게 알림이 가지 않습니다",Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+                member.setAlarm(target.get_Id(), false, new Member.OnSetCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(getApplicationContext(),"보호자에게 알림이 가지 않습니다",Toast.LENGTH_SHORT).show();
+                    }
 
+                    @Override
+                    public void onFailure(String err) {
+                        Toast.makeText(getApplicationContext(),"BtnOff 실패",Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -320,23 +333,25 @@ public class TargetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 target.setEmergency(true);
-                //TODO @동현 emergency를 true로 변경 하게 수정.  + TODO: 보호자 측에서 변경 확인후 변경 요망.
+                //TODO @소은 확인 후 emegency를 false로 하는건 보호자클래스에서 해야됨!
                 Member member = new Member();
                 member.setEmergency(target.get_Id(), true, new Member.OnSetCompleteListener() {
                     @Override
                     public void onComplete() {
                         // 바꾸는거 성공시. (안써도됨)
+                        Toast.makeText(getApplicationContext(),"모든 보호자에게 긴급 알람을 보냅니다",Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onFailure(String err) {
                         //바꾸는거 실패시.(안써도됨)
+                        Toast.makeText(getApplicationContext(),"긴급 알람 실패",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
 
-        setLocation();
+
     }
     public void setLocation(){
 
@@ -348,12 +363,12 @@ public class TargetActivity extends AppCompatActivity {
     }
 
 
-    public void showRefused(){
+    public void showRefused(String pid){
         //연결요청을 거부당했다는 팝업을 띄운다.
-        target.setStatus(-1);
-        noProtector.setVisibility(View.VISIBLE);
+//        target.setStatus(-1);
+//        noProtector.setVisibility(View.VISIBLE);
         //TODO: @동현: 이거는 연결을 하는 순간 status값이 -1로 바뀌는지 검사하는 Observer를 만드는걸로 할게. 이 함수에서는 팝업만 여는걸로 하는게 어떠심.
-        Toast.makeText(getApplicationContext(),"연결 요청이 거절당했습니다.",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),pid+"님이 연결 요청을 거부했습니다.",Toast.LENGTH_SHORT).show();
     }
 
 
@@ -366,8 +381,6 @@ public class TargetActivity extends AppCompatActivity {
             target.setLocation(latitude,longitude);                             //target에 저장
             //db에도 저장
 
-            //TODO: @동현: 이것도 마찬가지로  location값이 target으로 갔기 때문에 Member 클래스에서 호출합니다.
-            Member member = new Member();
             member.updateLocation(target.get_Id(), new LatLng(latitude,longitude), new Member.OnSetCompleteListener(){
 
                 @Override
