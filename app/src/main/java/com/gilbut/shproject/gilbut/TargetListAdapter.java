@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.gilbut.shproject.gilbut.model.Connection;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -35,10 +36,10 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
 
         }
 
-        Connection connection = list.get(position);
+        final Connection connection = list.get(position);
         if(connection != null){
             TextView tid = (TextView)v.findViewById(R.id.target_id);
-            TextView tpos = (TextView)v.findViewById(R.id.target_pos);
+            final TextView tpos = (TextView)v.findViewById(R.id.target_pos);
 
 
             if(tid != null){
@@ -46,7 +47,19 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
 
             }
             if(tpos != null){
-                tpos.setText(connection.location.get("latitude").toString() + ", " +connection.location.get("longitude").toString());
+                Member member = new Member();
+                member.getLocation(connection.tId, new Member.OnGetLocationListener() {
+                    @Override
+                    public void onComplete(LatLng location) {
+                        tpos.setText(location.latitude + ", " +location.longitude);
+                    }
+
+                    @Override
+                    public void onFailure(String err) {
+
+                    }
+                });
+
             }
         }
 

@@ -22,6 +22,8 @@ package com.gilbut.shproject.gilbut;
         import android.widget.Toast;
 
         import com.gilbut.shproject.gilbut.model.Connection;
+        import com.google.android.gms.maps.model.LatLng;
+        import com.google.firebase.auth.FirebaseAuth;
 
         import java.util.ArrayList;
 
@@ -97,6 +99,11 @@ public class TargetActivity extends AppCompatActivity {
         noProtector = (TextView)findViewById(R.id.noProtector);
         tWait = (TextView)findViewById(R.id.tWait);
         fab = (FloatingActionButton)findViewById(R.id.fab);
+        connectionController = new ConnectionController();
+
+        // Auth를 이용해서 아이디 받아오기.
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        target.set_Id(auth.getCurrentUser().getEmail());
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -114,21 +121,48 @@ public class TargetActivity extends AppCompatActivity {
                 // 확인 버튼 설정
                 ad.setButton(DialogInterface.BUTTON_POSITIVE,"요청 전송", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(final DialogInterface dialog, int which) {
                         //파베에 새로운 연결 생성.
-                        String p_Id = editText.getText().toString();
-                        //TODO p_id (대상이 연결을 원하는 보호자의 아이디)를 입력받아서, 즉 target id랑 protector Id를 입력받아서 connection list에 있는지를 확인.
+                        final String p_Id = editText.getText().toString();
+                        // p_id (대상이 연결을 원하는 보호자의 아이디)를 입력받아서, 즉 target id랑 protector Id를 입력받아서 connection list에 있는지를 확인.
                         //있으면 이미 요청된 거라고 알람을 띄우고 없으면 아래 로직 진행. 그리고 y_id필요없댔으니까 get_id로만.
-
-
-
-//                        target.setY_Id(y_Id);
-//                         (대상 id, 보호자 id, status, 성공시 콜백-OnSetCompleteListener)
-                        connectionController.addNewConnection(target.get_Id(), p_Id, 0, new ConnectionController.OnSetCompleteListener() {
+                        connectionController.getConnection(target.get_Id(), p_Id, new ConnectionController.OnGetConnectionListener() {
                             @Override
-                            public void onComplete() {
-                                //새로운 연결 생성 완료.
-                                Toast.makeText(getApplicationContext(), "요청완료", Toast.LENGTH_SHORT).show();
+                            public void onComplete(Connection connection) {
+                                //연결 존재.
+                                if (connection != null) {
+                                    //TODO: @동현. 이미 연결 있다고 알림 띄우기. 일단 내가 임시로 토스트로 걸어둠. 원하는대로 바꾸세요.
+                                    Toast.makeText(getApplicationContext(), "이미 연결된 보호자입니다!", Toast.LENGTH_LONG).show();
+                                } else { // 연결 없음. -> 새로 연결 생성.
+                                    connectionController.addNewConnection(target.get_Id(), p_Id, 0, new ConnectionController.OnSetCompleteListener() {
+                                        @Override
+                                        public void onComplete() {
+                                            //새로운 연결 생성 완료.
+                                            Toast.makeText(getApplicationContext(), "요청완료", Toast.LENGTH_SHORT).show();
+                                            // status값이 바뀔 때마다 검사할 Observer 등록.
+                                            final Observer statusObserver = new Observer();
+                                            statusObserver.setObservingConnectionStatus(target.get_Id(), p_Id, new Observer.OnObservedDataChange() {
+                                                @Override
+                                                public void OnDataChange(Object object) {
+                                                    int status = (int)object;
+                                                    if(status == 3){ // 보호자가 거절했을 때.
+                                                        showRefused();
+
+                                                        statusObserver.removeObserver();
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onFailure(String err) { // 연결 입력이 왠지 취소됬을 때인듯.
+                                            Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show(); // "CANCELED"
+                                        }
+                                    });
+
+                                    target.setStatus(0);
+                                    dialog.dismiss();
+                                }
                             }
 
                             @Override
@@ -136,9 +170,6 @@ public class TargetActivity extends AppCompatActivity {
 
                             }
                         });
-
-                        target.setStatus(0);
-                        dialog.dismiss();
                     }
                 });
                 ad.setButton(DialogInterface.BUTTON_NEGATIVE,"취소", new DialogInterface.OnClickListener() {
@@ -169,10 +200,14 @@ public class TargetActivity extends AppCompatActivity {
 
         //m_id로 연결db에서 정보들을 가져와 y_id, status를 초기화한다.
         connectionController = new ConnectionController();
-        //TODO m_id를 입력받아서 연결된 모든 정보를 받아와야함. (보호자 리스트) => 수정
-        connectionController.getConnections(m_Id, new ConnectionController.OnGetConnectionsListener() {
+        //m_id를 입력받아서 연결된 모든 정보를 받아와야함. (보호자 리스트) => 수정
+        connectionController.geTargetConnections(m_Id, new ConnectionController.OnGetConnectionsListener() {
             @Override
-            public void onComplete(ArrayList<Connection> connection) {
+            public void onComplete(ArrayList<Connection> connections) {
+                //TODO: @동현 targetId로 connections(ArrayList<Connection>) 정보 받오는거 해뒀음. 밑에 for문에서 처리하면 될것.
+                for(Connection connection : connections){
+                    String protector = connection.pId; // 보호자 아이디 꺼내기 예시.
+                }
                 // connection 내부에 연결여부 들어있음.
 //                target.setStatus(connection.status.intValue());
 ////                target.setAlarm(connection.alarm);
@@ -192,7 +227,7 @@ public class TargetActivity extends AppCompatActivity {
         });
     }
 
-
+    //TODO:  이 함수 수정하는게 좋을것 같습니다. n:m 상황에서 못쓸것 같습니다.
     public void checkStatus(){
         //status를 확인해서 각각 상황에 맞는 작업을 수행한다.
         int status = target.getStatus();
@@ -202,6 +237,7 @@ public class TargetActivity extends AppCompatActivity {
         eBtn.setVisibility(View.GONE);
         noProtector.setVisibility(View.GONE);
         fab.show();
+        //TODO: location보내는건 토글버튼 로케이션 보내게 설정되어있을때 연결 정보랑 상관없이 계속 보내느게 좋을거 같음.
         if(status == 1){
             //연결이 완료되어있는경우
             showToggle();
@@ -221,8 +257,10 @@ public class TargetActivity extends AppCompatActivity {
             showRefused();
         }
         else {
+            //TODO: 이거 처음에 연결정보 없어서 null 뜰수 있어서 status -1처럼 처리해야될거같은데.
+            noProtector.setVisibility(View.VISIBLE);
             Toast.makeText(getApplicationContext(),"Status 값이 잘못되었습니다",Toast.LENGTH_SHORT).show();
-            finish();
+            //finish();
         }
     }
 
@@ -243,15 +281,20 @@ public class TargetActivity extends AppCompatActivity {
                 target.setAlarm(true);
                 onBtn.setVisibility(View.GONE);
                 offBtn.setVisibility(View.VISIBLE);
-                //TODO 아래 controller꼴처럼, 기존에는 y_id도 집어넣었었는데 없애주라!
+                //TODO  @동현: 수정 완료. alarm은 기존 connection에 저장하다가 target에 저장하는걸로 바꿨음. 그에 맞게 변화.
                 //db에도 저장
-//                connectionController.setAlarm(target.get_Id(), true, new ConnectionController.OnSetCompleteListener() {
-//                    @Override
-//                    public void onComplete() {
-//                        Toast.makeText(getApplicationContext(),"보호자에게 알림을 보냅니다",Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+                Member member = new Member();
+                member.setAlarm(target.get_Id(), true, new Member.OnSetCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(getApplicationContext(),"보호자에게 알림을 보냅니다",Toast.LENGTH_SHORT).show();
+                    }
 
+                    @Override
+                    public void onFailure(String err) {
+
+                    }
+                });
             }
         });
 
@@ -277,8 +320,19 @@ public class TargetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 target.setEmergency(true);
-                //TODO emergency를 true로! 그리고 보호자에서 확인했으면 false로 바꿔야함
+                //TODO @동현 emergency를 true로 변경 하게 수정.  + TODO: 보호자 측에서 변경 확인후 변경 요망.
+                Member member = new Member();
+                member.setEmergency(target.get_Id(), true, new Member.OnSetCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        // 바꾸는거 성공시. (안써도됨)
+                    }
 
+                    @Override
+                    public void onFailure(String err) {
+                        //바꾸는거 실패시.(안써도됨)
+                    }
+                });
             }
         });
 
@@ -298,13 +352,8 @@ public class TargetActivity extends AppCompatActivity {
         //연결요청을 거부당했다는 팝업을 띄운다.
         target.setStatus(-1);
         noProtector.setVisibility(View.VISIBLE);
-        //TODO 이것도 마찬가지로 Y_id를 빼줘
-//        connectionController.updateConnectionStatus(target.get_Id(), -1, new ConnectionController.OnSetCompleteListener() {
-//            @Override
-//            public void onComplete() {
-//                Toast.makeText(getApplicationContext(),"연결 요청이 거절당했습니다.",Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        //TODO: @동현: 이거는 연결을 하는 순간 status값이 -1로 바뀌는지 검사하는 Observer를 만드는걸로 할게. 이 함수에서는 팝업만 여는걸로 하는게 어떠심.
+        Toast.makeText(getApplicationContext(),"연결 요청이 거절당했습니다.",Toast.LENGTH_SHORT).show();
     }
 
 
@@ -317,13 +366,20 @@ public class TargetActivity extends AppCompatActivity {
             target.setLocation(latitude,longitude);                             //target에 저장
             //db에도 저장
 
-            //TODO 이것도 마찬가지로 Y_ID 빼줘!
-//            connectionController.updateLocation(target.get_Id(), latitude, longitude, new ConnectionController.OnSetCompleteListener() {
-//                @Override
-//                public void onComplete() {
-//                                Toast.makeText(getApplicationContext(),"위도 " +latitude+" 경도 "+ longitude,Toast.LENGTH_SHORT).show();
-//                }
-//            });
+            //TODO: @동현: 이것도 마찬가지로  location값이 target으로 갔기 때문에 Member 클래스에서 호출합니다.
+            Member member = new Member();
+            member.updateLocation(target.get_Id(), new LatLng(latitude,longitude), new Member.OnSetCompleteListener(){
+
+                @Override
+                public void onComplete() {
+                    Toast.makeText(getApplicationContext(),"위도 " +latitude+" 경도 "+ longitude,Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(String err) {
+
+                }
+            });
 
         }
 

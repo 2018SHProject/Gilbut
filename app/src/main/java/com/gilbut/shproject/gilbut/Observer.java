@@ -18,7 +18,7 @@ public class Observer {
 
 
     public void setObservingConnectionStatus(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
-        ref = db.getReference("connection/"+targetId+"-"+protectorId).child("status");
+        ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".","")).child("status");
         eventListener = ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -34,7 +34,7 @@ public class Observer {
     }
 
     public void setObservingLocation(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
-        ref = db.getReference("connection/"+targetId+"-"+protectorId).child("location");
+        ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".","")).child("location");
         eventListener = ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

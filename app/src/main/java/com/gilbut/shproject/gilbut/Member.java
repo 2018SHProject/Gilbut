@@ -40,7 +40,7 @@ public class Member {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                     TargetMember target = snapshot.getValue(TargetMember.class);
-                    if( target != null && target.getmId().equals(targetId)){
+                    if( target != null && target.mId.equals(targetId)){
                         onGetTargetListener.onGetData(target);
                         return;
                     }
@@ -127,6 +127,55 @@ public class Member {
         });
     }
 
+    // 내 정보 넣는 함수
+    public void putthis() {
+        Log.d("put", "member");
+        // Target DB에 정보 넣기
+        DatabaseReference targetRef2 = db.getReference("target");
+        Map<String, String> targetValues = new HashMap<>();
+        targetValues.put("mId", uemail);
+        targetValues.put("yId", "");
+        targetRef2.child(uid).child("mId").setValue(targetValues.get("mId"));
+        targetRef2.child(uid).child("yId").setValue(targetValues.get("yId"));
+        targetRef2.child(uid).child("alarm").setValue(true);
+        targetRef2.child(uid).child("emergency").setValue(false);
+        HashMap<String, Object> location = new HashMap<>();
+        location.put("latitude", 0);
+        location.put("longitude", 0);
+        targetRef2.child(uid).child("location").setValue(location);
+        // Protector DB에 정보 넣기
+        DatabaseReference protectorRef2 = db.getReference("protector");
+        Map<String, String> protectorValues = new HashMap<>();
+        protectorValues.put("mId", uemail);
+        protectorValues.put("yId", "");
+        protectorRef2.child(uid).child("mId").setValue(protectorValues.get("mId"));
+        protectorRef2.child(uid).child("yId").setValue(targetValues.get("yId"));
+    }
+
+    public void getLocation(final String targetId, final OnGetLocationListener onGetLocationListener){
+        DatabaseReference ref = db.getReference("target");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    TargetMember target = snapshot.getValue(TargetMember.class);
+                    if (target != null && target.mId.equals(targetId)) {
+                        LatLng newLocation = target.getLocation();
+                        onGetLocationListener.onComplete(newLocation);
+                    }else{
+                        onGetLocationListener.onFailure("타겟 없음");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onGetLocationListener.onFailure(databaseError.toString());
+            }
+        });
+    }
+
+    // 타겟의 위치를 업데이트 하는 함수.
     public void updateLocation(final String targetId, final LatLng location, final OnSetCompleteListener onUpdateCompleteListener){
         final DatabaseReference ref = db.getReference("target");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -134,7 +183,7 @@ public class Member {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                     TargetMember target = snapshot.getValue(TargetMember.class);
-                    if(target != null && target.getmId().equals(targetId)){
+                    if(target != null && target.mId.equals(targetId)){
                         HashMap<String, Object> locationUpdates = new HashMap<>();
                         locationUpdates.put("latitude", location.latitude);
                         locationUpdates.put("longitude", location.longitude);
@@ -160,34 +209,36 @@ public class Member {
 
     }
 
+    //위치 정보를 보낸다, 안보낸다 설정.
     public void setAlarm(final String targetId, final boolean alarm, final OnSetCompleteListener onSetCompleteListener){
         final DatabaseReference ref = db.getReference("target");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
-           @Override
-           public void onDataChange(DataSnapshot dataSnapshot) {
-               for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                   TargetMember target = snapshot.getValue(TargetMember.class);
-                   if (target != null && target.getmId().equals(targetId)) {
-                       snapshot.getRef().child("alarm").setValue(alarm, new DatabaseReference.CompletionListener() {
-                           @Override
-                           public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                               if(onSetCompleteListener!=null){
-                                   onSetCompleteListener.onComplete();
-                               }
-                           }
-                       });
-                   }else{
-                       onSetCompleteListener.onFailure("no target");
-                   }
-               }
-           }
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    TargetMember target = snapshot.getValue(TargetMember.class);
+                    if (target != null && target.mId.equals(targetId)) {
+                        snapshot.getRef().child("alarm").setValue(alarm, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if(onSetCompleteListener!=null){
+                                    onSetCompleteListener.onComplete();
+                                }
+                            }
+                        });
+                    }else{
+                        onSetCompleteListener.onFailure("no target");
+                    }
+                }
+            }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 onSetCompleteListener.onFailure("on cancel");
             }
-       });
+        });
     }
 
+    // 위치 정보 보내는지 안보내는지 가져오기.
     public void getAlarm(final String targetId, final OnGetAlarmListener onGetAlarmListener){
         DatabaseReference ref = db.getReference("target");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -195,8 +246,8 @@ public class Member {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     TargetMember target = snapshot.getValue(TargetMember.class);
-                    if (target != null && target.getmId().equals(targetId)) {
-                        onGetAlarmListener.onComplete(target.isAlarm());
+                    if (target != null && target.mId.equals(targetId)) {
+                        onGetAlarmListener.onComplete(target.alarm);
                     }else{
                         onGetAlarmListener.onFailure("타겟 없음");
                     }
@@ -210,24 +261,58 @@ public class Member {
         });
     }
 
-    // 내 정보 넣는 함수
-    public void putthis() {
-        Log.d("put", "member");
-        // Target DB에 정보 넣기
-        DatabaseReference targetRef2 = db.getReference("target");
-        Map<String, String> targetValues = new HashMap<>();
-        targetValues.put("mId", uemail);
-        targetValues.put("yId", "");
-        targetRef2.child(uid).child("mId").setValue(targetValues.get("mId"));
-        targetRef2.child(uid).child("yId").setValue(targetValues.get("yId"));
-        // Protector DB에 정보 넣기
-        DatabaseReference protectorRef2 = db.getReference("protector");
-        Map<String, String> protectorValues = new HashMap<>();
-        protectorValues.put("mId", uemail);
-        protectorValues.put("yId", "");
-        protectorRef2.child(uid).child("mId").setValue(protectorValues.get("mId"));
-        protectorRef2.child(uid).child("yId").setValue(targetValues.get("yId"));
+    //긴급상황 이라고 보내기! ( 값을 바꾸면 이 값을 관찰하고 있던 보호자 측에서 알게 되는걸로..)
+    public void setEmergency(final String targetId, final boolean emergency, final OnSetCompleteListener onSetCompleteListener){
+        final DatabaseReference ref = db.getReference("target");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    TargetMember target = snapshot.getValue(TargetMember.class);
+                    if (target != null && target.mId.equals(targetId)) {
+                        snapshot.getRef().child("emergency").setValue(emergency, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if(onSetCompleteListener!=null){
+                                    onSetCompleteListener.onComplete();
+                                }
+                            }
+                        });
+                    }else{
+                        onSetCompleteListener.onFailure("no target");
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onSetCompleteListener.onFailure("on cancel");
+            }
+        });
     }
+
+    // 긴급 상황인지 가져오기(노쓸모 예정)
+    public void getEmergency(final String targetId, final OnGetEmergencyListener onGetEmergencyListener){
+        DatabaseReference ref = db.getReference("target");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    TargetMember target = snapshot.getValue(TargetMember.class);
+                    if (target != null && target.mId.equals(targetId)) {
+                        onGetEmergencyListener.onComplete(target.emergency);
+                    }else{
+                        onGetEmergencyListener.onFailure("타겟 없음");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onGetEmergencyListener.onFailure(databaseError.toString());
+            }
+        });
+    }
+
 
     public interface OnGetTargetListener{
         public void onGetData(TargetMember target);
@@ -243,8 +328,18 @@ public class Member {
         public void onFailure(String err);
     }
 
+    public interface OnGetEmergencyListener {
+        public void onComplete(boolean emergency);
+        public void onFailure(String err);
+    }
+
     public interface OnSetCompleteListener {
         public void onComplete();
+        public void onFailure(String err);
+    }
+
+    public interface OnGetLocationListener {
+        public void onComplete(LatLng location);
         public void onFailure(String err);
     }
 }

@@ -9,12 +9,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class ConnectionController {
     //Connection
@@ -22,7 +24,7 @@ public class ConnectionController {
     public FirebaseDatabase db= FirebaseDatabase.getInstance();
 
     public void updateConnectionStatus(String targetId, String protectorId, int status, @Nullable final OnSetCompleteListener onUpdateCompleteListener) {
-        DatabaseReference ref = db.getReference("connection/" + targetId + "-" + protectorId);
+        DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         Map<String, Object> connectionUpdates = new HashMap<>();
         connectionUpdates.put("status", status);
         ref.updateChildren(connectionUpdates, new DatabaseReference.CompletionListener() {
@@ -47,8 +49,8 @@ public class ConnectionController {
                 SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String time = transFormat.format(date);
                 DatabaseReference ref = db.getReference("connection");
-                Connection newConnection = new Connection((long) status, targetId, protectorId,  "", time,  true, 37.502340, 127.019027 );
-                String path = targetId + "-" + protectorId;
+                Connection newConnection = new Connection((long) status, targetId, protectorId,  "", time );
+                String path = targetId.replace(".","")+"-"+protectorId.replace(".","");
 
                 ref.child(path).setValue(newConnection, new DatabaseReference.CompletionListener() {
                     @Override
@@ -69,9 +71,13 @@ public class ConnectionController {
 
     }
 
+    public void removeConnection(String targetId, String protectorId, OnRemoveListener onRemoveListener){
+        DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
+        ref.removeValue();
+    }
 
     public void getConnectionStatus(String targetId, String protectorId, final OnGetCompleteListener onGetCompleteListener){
-        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
+        DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -89,7 +95,7 @@ public class ConnectionController {
     }
 
     public void getConnection(String targetId, String protectorId, final OnGetConnectionListener onGetConnectionListener){
-        DatabaseReference ref = db.getReference("connection/"+targetId+"-"+protectorId);
+        DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -104,30 +110,29 @@ public class ConnectionController {
         });
     }
 
-    public void getConnections(final String targetId, final OnGetConnectionListener onGetConnectionListener){
+    public void geTargetConnections(final String targetId, final OnGetConnectionsListener onGetConnectionsListener){
         DatabaseReference ref = db.getReference("connection");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<Connection> connections = new ArrayList<>();
                 for(DataSnapshot targetSnapshot: dataSnapshot.getChildren()) {
                     Connection connection = targetSnapshot.getValue(Connection.class);
                     if (connection != null && connection.tId != null && connection.tId.equals(targetId)) {
-                        onGetConnectionListener.onComplete(connection);
-                    }else {
-                        onGetConnectionListener.onFailure("NO_DATA");
-                        break;
+                        connections.add(connection);
                     }
                 }
+                onGetConnectionsListener.onComplete(connections);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                onGetConnectionListener.onFailure("CANCELLED");
+                onGetConnectionsListener.onFailure("CANCELLED");
             }
         });
     }
 
     // protectorID로 연결이있는지 찾기
-    public void getConnections(final String protectorId, final OnGetConnectionsListener onGetConnectionsListener){
+    public void getProtectorConnections(final String protectorId, final OnGetConnectionsListener onGetConnectionsListener){
         DatabaseReference ref = db.getReference("connection");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -169,5 +174,9 @@ public class ConnectionController {
     public interface OnGetConnectionsListener {
         public void onComplete(ArrayList<Connection> connections);
         public void onFailure(String err);
+    }
+
+    public interface OnRemoveListener{
+        public void onCompletet();
     }
 }

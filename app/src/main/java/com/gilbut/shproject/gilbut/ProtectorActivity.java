@@ -38,6 +38,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -253,7 +254,9 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
         protector = new Protector();
         //protector.mId = intent.getStringExtra("mId");
-        protector.mId = "tazozzang";
+        // Auth에서 받아오도록 수정완료.
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        protector.mId = auth.getCurrentUser().getEmail();
         Toast.makeText(this, protector.mId, Toast.LENGTH_SHORT).show();
         protector.status = 1;
         connectionController = new ConnectionController();
@@ -283,14 +286,14 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
 
         connections = new ArrayList<Connection>();
-        connectionController.getConnections(protector.mId, new ConnectionController.OnGetConnectionsListener() {
+        connectionController.getProtectorConnections(protector.mId, new ConnectionController.OnGetConnectionsListener() {
             @Override
             public void onComplete(ArrayList<Connection> connection) {
                 connections.addAll(connection);
 
                 arrayAdapter = new TargetListAdapter(Pcontext, layout.target_list, connections);
                 listView.setAdapter(arrayAdapter);
-                // 모가 문제일까요
+                //TODO: 모가 문제일까요 => 조금뒤에 해결해보겠습니다.
             }
 
             @Override

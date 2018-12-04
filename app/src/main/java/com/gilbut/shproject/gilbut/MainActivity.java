@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity{
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                Toast.makeText(getApplicationContext(), "구글 인증 실패", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "구글 인증 실패"+e.toString(), Toast.LENGTH_SHORT).show();
             }
 //            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 //            if(result.isSuccess()) {

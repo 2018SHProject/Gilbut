@@ -12,6 +12,7 @@ public class TargetMember{
     public String mId;
     public Map<String,Double> location;
     public boolean alarm;
+    public boolean emergency;
 
     public TargetMember(){}
 
@@ -30,21 +31,5 @@ public class TargetMember{
         }
         else
             return null;
-    }
-
-    public boolean isAlarm() {
-        return alarm;
-    }
-
-    public String getmId() {
-        return mId;
-    }
-
-    public void setmId(String mId) {
-        this.mId = mId;
-    }
-
-    public void setAlarm(boolean alarm) {
-        this.alarm = alarm;
     }
 }
