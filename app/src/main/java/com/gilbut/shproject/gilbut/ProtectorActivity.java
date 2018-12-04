@@ -189,8 +189,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
                 }
             }
         });
-
-
     }
 
     public void checkPer(){
@@ -259,6 +257,17 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         protector.mId = auth.getCurrentUser().getEmail();
         Toast.makeText(this, protector.mId, Toast.LENGTH_SHORT).show();
         protector.status = 1;
+
+        // 보호자에게 연결을 시도할 때마다 실행!
+        Observer observer = new Observer();
+        observer.setObserveringNewConnection(protector.mId, new Observer.OnObservedDataChange() {
+            @Override
+            public void OnDataChange(Object object) {
+                Connection connection = (Connection)object;
+                //TODO: 여기서 연결하겠냐는 팝업 띄우면될거야. connection 정보에 보호자 정보도 있구. 연결 오키 하면 연결 status 1로 바꿔주기도 잊지말기!
+            }
+        });
+
         connectionController = new ConnectionController();
 
         mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);

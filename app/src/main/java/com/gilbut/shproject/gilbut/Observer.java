@@ -1,6 +1,8 @@
 package com.gilbut.shproject.gilbut;
 
+import com.gilbut.shproject.gilbut.model.Connection;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -10,6 +12,7 @@ import com.google.firebase.database.ValueEventListener;
 public class Observer {
     FirebaseDatabase db;
     ValueEventListener eventListener;
+    ChildEventListener childEventListener;
     DatabaseReference ref;
 
     Observer(){
@@ -50,8 +53,41 @@ public class Observer {
         });
     }
 
+    public void setObserveringNewConnection(final String protectorId, final OnObservedDataChange onObservedDataChange){
+        ref = db.getReference("connection/");
+        childEventListener = ref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if(protectorId.equals(dataSnapshot.child("pId").getValue(String.class))){
+                    onObservedDataChange.OnDataChange(dataSnapshot.getValue(Connection.class));
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public void removeObserver(){
         ref.removeEventListener(eventListener);
+        ref.removeEventListener(childEventListener);
     }
 
     public interface OnObservedDataChange{
