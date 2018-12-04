@@ -135,11 +135,20 @@ public class TestActivity extends AppCompatActivity {
 //        });
 
         //위치 변화 검사.
-//        Observer statusObserver = new Observer();
+        Observer statusObserver = new Observer();
 //        statusObserver.setObservingLocation("target1", "protector1", new Observer.OnObservedDataChange() {
 //            @Override
 //            public void OnDataChange(Object object) {
 //                textView.setText(object.toString());
+//            }
+//        });
+
+        //자식검사
+//        statusObserver.setObserveringNewConnection("jse52595@gmail.com", new Observer.OnObservedDataChange() {
+//            @Override
+//            public void OnDataChange(Object object) {
+//                Connection connection = (Connection) object;
+//                textView.setText(connection.tId);
 //            }
 //        });
 
@@ -165,6 +174,7 @@ public class TestActivity extends AppCompatActivity {
 //            }
 //
 //        });
+
     }
 
 
