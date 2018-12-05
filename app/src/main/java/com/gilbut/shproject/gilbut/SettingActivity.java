@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Range;
 import android.view.View;
 import android.widget.Button;
 
@@ -53,6 +54,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
 
     Button button;
 
+    String targetId;
 
     @Override
     protected void onStart() {
@@ -85,6 +87,8 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
     }
 
     public void init() {
+        Bundle extras = getIntent().getExtras();
+        targetId = extras.getString("targetId");
 
         polygonOptions = new PolygonOptions();
 
@@ -147,6 +151,22 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
         LatLng Loc = new LatLng(newLoc.getLatitude(), newLoc.getLongitude());
         map.clear();
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
+    }
+
+    // 범위 업데이트 하는 함수.
+    void updateRange(String targetId, String protectorId, String rangeRef, ArrayList<LatLng> range){
+        RangeController rangeController = new RangeController();
+        rangeController.updateRange(range, targetId, protectorId, new RangeController.OnSetRangeListener() {
+            @Override
+            public void onComplete(String rangeRef) {
+                //TODO: 소ㅓ은 여기 할차례.
+            }
+
+            @Override
+            public void onFailure(String err) {
+
+            }
+        });
     }
 
     @Override

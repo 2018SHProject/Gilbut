@@ -2,8 +2,10 @@ package com.gilbut.shproject.gilbut;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 
+import com.gilbut.shproject.gilbut.model.Connection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -85,35 +87,71 @@ public class RangeController{
             pos.put("longitude", latLng.longitude);
             mapRange.add(pos);
         }
-        final String uid = ref.getKey();
+        final String key = ref.getKey();
         ref.setValue(mapRange).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                setRangeListener.onComplete("range/"+uid);
+                setRangeListener.onComplete("range/"+key);
             }
         });
     }
 
-    public void updateRange(ArrayList<LatLng> range, final OnSetRangeListener setRangeListener) {
+    // 범위 업데이트 - range reference와 함께.
+    public void updateRange(final ArrayList<LatLng> range, String rangeRef, final OnSetRangeListener setRangeListener) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
-        DatabaseReference ref = db.getReference("range").push();
-        ArrayList<Map<String, Double>> mapRange = new ArrayList<>();
-        for(LatLng latLng : range){
-            HashMap<String, Double> pos = new HashMap<>();
-            pos.put("latitude", latLng.latitude);
-            pos.put("longitude",latLng.longitude);
-            mapRange.add(pos);
-        }
-        final String uid = ref.getKey();
-        ref.setValue(mapRange).addOnCompleteListener(new OnCompleteListener<Void>() {
+        final DatabaseReference ref = db.getReference(rangeRef);
+        final DatabaseReference newRef = db.getReference("range").push();
+        ref.removeValue(new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                setRangeListener.onComplete("range/"+uid);
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                ArrayList<Map<String, Double>> mapRange = new ArrayList<>();
+                for(LatLng latLng : range){
+                    HashMap<String, Double> pos = new HashMap<>();
+                    pos.put("latitude", latLng.latitude);
+                    pos.put("longitude",latLng.longitude);
+                    mapRange.add(pos);
+                }
+                final String uid = ref.getKey();
+                newRef.setValue(mapRange).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        setRangeListener.onComplete("range/"+uid);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        setRangeListener.onFailure(e.toString());
+                    }
+                });
             }
-        }).addOnFailureListener(new OnFailureListener() {
+        });
+
+    }
+
+    // 범위 업데이트 - target고 ㅏ protector오 ㅏ함께.
+    public void updateRange(final ArrayList<LatLng> range, String targetId, String protectorId, final OnSetRangeListener setRangeListener) {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        final DatabaseReference connectionRef = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
+        connectionRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                setRangeListener.onFailure(e.toString());
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Connection connection = dataSnapshot.getValue(Connection.class);
+                updateRange(range, connection.rangeRef, new OnSetRangeListener() {
+                    @Override
+                    public void onComplete(String rangeRef) {
+                        setRangeListener.onComplete(rangeRef);
+                    }
+
+                    @Override
+                    public void onFailure(String err) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }

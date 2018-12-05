@@ -17,7 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -44,6 +43,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
@@ -204,12 +204,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     }
 
 
-    void openSetting(){
-
-        Intent intent = new Intent(getApplicationContext(),SettingActivity.class);
-        startActivityForResult(intent, setting_Result);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -223,12 +217,14 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             if(latLngs != null) {
                 Toast.makeText(this,"Latlng 넘어옴"  ,Toast.LENGTH_LONG).show();
 
-                printMap(latLngs.get(0).latitude,latLngs.get(0).longitude);
+
                 PolygonOptions polygonOptions = new PolygonOptions();
                polygonOptions.addAll(latLngs);
                 polygonOptions.strokeWidth(15);
                 polygonOptions.strokeColor(Color.rgb(255, 203, 81));
                 Polygon polygon = map.addPolygon(polygonOptions);
+                printMap(latLngs.get(0).latitude,latLngs.get(0).longitude);
+
             }
             else{
                 Toast.makeText(this,"Latlng 안 넘어옴",Toast.LENGTH_LONG).show();
@@ -239,12 +235,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-            openSetting();
-
-        return true;
-    }
 
     public void init(){
 
@@ -300,9 +290,12 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             public void onComplete(ArrayList<Connection> connection) {
                 connections.addAll(connection);
 
+                // 여기에 새롭게 printRangeMap하는 함수 추가해서 범위 그리기
+
                 arrayAdapter = new TargetListAdapter(Pcontext, layout.target_list, connections);
                 listView.setAdapter(arrayAdapter);
-                //TODO: 모가 문제일까요 => 조금뒤에 해결해보겠습니다.
+               // Connection c = listView.getAdapter().getItem(0);
+
             }
 
             @Override
@@ -316,12 +309,52 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
     }
 
+
+
+    public void printRangeMap(ArrayList<LatLng> latLngs){
+        PolygonOptions polygonOptions = new PolygonOptions();
+        polygonOptions.addAll(latLngs);
+        polygonOptions.strokeWidth(15);
+        polygonOptions.strokeColor(Color.rgb(255,203,81));
+        Polygon polygon = map.addPolygon(polygonOptions);
+
+
+    }
+
     public void printMap(double lat, double lng){
         final LatLng Loc = new LatLng(lat, lng);
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
 
         // 여기서 범위 이탈 체크하고 알림 주기
 
+    }
+
+    public boolean checkLeave(LatLng targetPoint, ArrayList<LatLng> lists, boolean Tprevent){
+
+        boolean inside = PolyUtil.containsLocation(targetPoint, lists , true );
+        // true 면 좌표 안에 존재하는 것
+        // false 면 좌표 안에 존재하지 않는 것
+        if(Tprevent){ // Tprevent에 따라 return이 달라짐
+            //ex Tprevent == true >> 범위 이탈을 보고 싶다
+            // Tprevent == true && inside == true
+            // 범위 내에 잘 있다
+            //Tprevent == true && inside == false
+            // 범위 이탈 했다.
+            return inside;
+        }
+        else{
+            // Tprevent == false >> 접근 금지를 보고 싶다
+            // 범위 내에 있지 않다
+            //Tprevent == false && inside == true
+            // 범위 내로 접근 했다.
+            //Tprevent == false && inside == false
+            // 범위에 접근 하지 않았다
+            return !(inside);
+
+            // 아무튼 inside가 false 일 때 알림 주기
+            // else 에서 return !(inside) 이기 때문에
+            // 안에 포함되는 경우 (접근한 경우)
+        }
     }
 
     public void initFire(){
@@ -444,4 +477,9 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         return (SphericalUtil.computeDistanceBetween(me, target_latlng));
     }
 
+    public void logoutClick(View view) {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 }

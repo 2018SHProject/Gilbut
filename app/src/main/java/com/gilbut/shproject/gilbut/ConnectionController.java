@@ -23,6 +23,7 @@ public class ConnectionController {
 
     public FirebaseDatabase db= FirebaseDatabase.getInstance();
 
+    // 연결 정보만 업데이트.
     public void updateConnectionStatus(String targetId, String protectorId, int status, @Nullable final OnSetCompleteListener onUpdateCompleteListener) {
         DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         Map<String, Object> connectionUpdates = new HashMap<>();
@@ -37,6 +38,7 @@ public class ConnectionController {
         });
     }
 
+    // 연결 통째로 업데이트
     public void updateConnection(String targetId, String protectorId, int status, String rangeRef, boolean prevent, @Nullable final OnSetCompleteListener onUpdateCompleteListener){
         DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         long now = System.currentTimeMillis();
@@ -52,6 +54,7 @@ public class ConnectionController {
         });
     }
 
+    // 범위 나가는거인지 들어오는거인지 설정하는거 업데이트
     public void updateConnectionPrevent(final String targetId, final String protectorId, final boolean prevent, @Nullable final OnSetCompleteListener onUpdateCompleteListener){
         final DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -79,6 +82,7 @@ public class ConnectionController {
 
     }
 
+    // 범위 저장된 위치 reference 업데이트
     public void updateConnectionRangeReference(final String targetId, final String protectorId, final String rangeRef, @Nullable final OnSetCompleteListener onUpdateCompleteListener){
         final DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -140,11 +144,13 @@ public class ConnectionController {
 
     }
 
+    // 연결 파베에서 삭제
     public void removeConnection(String targetId, String protectorId, OnRemoveListener onRemoveListener){
         DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         ref.removeValue();
     }
 
+    // status 받아오기.
     public void getConnectionStatus(String targetId, String protectorId, final OnGetCompleteListener onGetCompleteListener){
         DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -163,6 +169,7 @@ public class ConnectionController {
         });
     }
 
+    // 타겟과 보호자 모두 입력해서 연결 하나 가져오기.
     public void getConnection(String targetId, String protectorId, final OnGetConnectionListener onGetConnectionListener){
         DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -179,6 +186,7 @@ public class ConnectionController {
         });
     }
 
+    // 타겟으로 있는 모든 연결 가져오기
     public void geTargetConnections(final String targetId, final OnGetConnectionsListener onGetConnectionsListener){
         DatabaseReference ref = db.getReference("connection");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -200,7 +208,7 @@ public class ConnectionController {
         });
     }
 
-    // protectorID로 연결이있는지 찾기
+    // 보호자로 있는 모든 연결 가져오기.
     public void getProtectorConnections(final String protectorId, final OnGetConnectionsListener onGetConnectionsListener){
         DatabaseReference ref = db.getReference("connection");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -225,6 +233,7 @@ public class ConnectionController {
         });
     }
 
+    // 각종 리스너들. 비동기 처리를 위해 만듬.
     public interface OnSetCompleteListener {
         public void onComplete();
         public void onFailure(String err);
