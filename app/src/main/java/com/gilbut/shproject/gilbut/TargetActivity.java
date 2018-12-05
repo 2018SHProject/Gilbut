@@ -65,11 +65,14 @@ public class TargetActivity extends AppCompatActivity {
             Manifest.permission.READ_PHONE_STATE
     };
 
+    FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_target);
+
+        auth = FirebaseAuth.getInstance();
 
         if(ContextCompat.checkSelfPermission(this, String.valueOf(permission_list)) == PackageManager.PERMISSION_DENIED){
             checkPer();
@@ -135,7 +138,7 @@ public class TargetActivity extends AppCompatActivity {
                         //있으면 이미 요청된 거라고 알람을 띄우고 없으면 아래 로직 진행. 그리고 y_id필요없댔으니까 get_id로만.
                         connectionController.getConnection(target.get_Id(), p_Id, new ConnectionController.OnGetConnectionListener() {
                             @Override
-                            public void onComplete(Connection connection) {
+                            public void onComplete(final Connection connection) {
                                 //연결 존재.
                                 if (connection != null) {
 
@@ -152,10 +155,21 @@ public class TargetActivity extends AppCompatActivity {
                                                 @Override
                                                 public void OnDataChange(Object object) {
                                                     int status = (int)object;
-                                                    if(status == 3){ // 보호자가 거절했을 때.
-//                                                        showRefused();
-
-                                                        statusObserver.removeObserver();
+                                                    Toast.makeText(getApplicationContext(), "status: "+status, Toast.LENGTH_LONG).show();
+                                                    switch(status){
+                                                        case 1:
+                                                            // TODO: 목록 갱신 필요.
+                                                            break;
+                                                        case 2:
+//                                                          showRefused();
+                                                            statusObserver.removeObserver();
+                                                            connectionController.removeConnection(target.get_Id(), p_Id, new ConnectionController.OnRemoveListener() {
+                                                                @Override
+                                                                public void onCompletet() {
+                                                                    //삭제 완료후 처리.
+                                                                }
+                                                            });
+                                                            break;
                                                     }
                                                 }
                                             });
@@ -203,8 +217,7 @@ public class TargetActivity extends AppCompatActivity {
     }
 
     public void setting(){
-        String m_Id = intent.getStringExtra("mId");
-
+        String m_Id = auth.getCurrentUser().getEmail();
         //m_id로 연결db에서 정보들을 가져와 y_id, status를 초기화한다.
         connectionController = new ConnectionController();
         //m_id를 입력받아서 연결된 모든 정보를 받아와야함. (보호자 리스트) => 수정
