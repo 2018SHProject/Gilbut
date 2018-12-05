@@ -319,7 +319,7 @@ public class TargetActivity extends AppCompatActivity {
         tWait.setVisibility(View.GONE);
         eBtn.setVisibility(View.GONE);
         noProtector.setVisibility(View.GONE);
-        fab.show();
+        //fab.show(); //TODO: ??여기서 오류가 나는데 이게 뭐야?
         setLocation();
 
         if(isConnected == 1) {
