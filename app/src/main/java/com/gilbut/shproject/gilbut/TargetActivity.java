@@ -1,31 +1,30 @@
 package com.gilbut.shproject.gilbut;
 
         import android.Manifest;
-        import android.app.AlertDialog;
-        import android.content.Context;
-        import android.content.DialogInterface;
-        import android.content.Intent;
-        import android.content.pm.PackageManager;
-        import android.location.Location;
-        import android.location.LocationListener;
-        import android.location.LocationManager;
-        import android.os.Bundle;
-        import android.support.design.widget.FloatingActionButton;
-        import android.support.v4.app.ActivityCompat;
-        import android.support.v4.content.ContextCompat;
-        import android.support.v7.app.AppCompatActivity;
-        import android.util.Log;
-        import android.view.View;
-        import android.widget.Button;
-        import android.widget.EditText;
-        import android.widget.TextView;
-        import android.widget.Toast;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
-        import com.gilbut.shproject.gilbut.model.Connection;
-        import com.google.android.gms.maps.model.LatLng;
-        import com.google.firebase.auth.FirebaseAuth;
+import com.gilbut.shproject.gilbut.model.Connection;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
 
-        import java.util.ArrayList;
+import java.util.ArrayList;
 
 //대상이 보호자에게 연결요청, 이 후 보호자가 대상에게 위치정보요청
 //status 설명
@@ -52,6 +51,9 @@ public class TargetActivity extends AppCompatActivity {
     double latitude;
     double longitude;
     ArrayList<Connection> plist;                                                //연결된 보호자 리스트
+
+    // 우용 추가
+    Button logoutBtn;                                                           // 로그아웃 버튼
 
     int statuss;                                                                //연결상태
 
@@ -109,6 +111,8 @@ public class TargetActivity extends AppCompatActivity {
         connectionController = new ConnectionController();
         member = new Member();
         plist = new ArrayList<>();
+        // 우용 추가
+        logoutBtn = (Button)findViewById(R.id.targetlogoutBtn);
         statuss = -1;
 
         // Auth를 이용해서 아이디 받아오기.
@@ -292,6 +296,8 @@ public class TargetActivity extends AppCompatActivity {
 
     public void showToggle(){
         eBtn.setVisibility(View.VISIBLE);
+        // 우용 추가
+        logoutBtn.setVisibility(View.VISIBLE);
 
         if(target.getAlarm()){                          //만약 alarm을 켜 놓은 경우라면?
             onBtn.setVisibility(View.GONE);
@@ -363,7 +369,16 @@ public class TargetActivity extends AppCompatActivity {
                 });
             }
         });
-
+        
+        // 우용 추가
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
     public void setLocation(){

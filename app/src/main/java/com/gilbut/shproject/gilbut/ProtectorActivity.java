@@ -445,4 +445,9 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         return (SphericalUtil.computeDistanceBetween(me, target_latlng));
     }
 
+    public void logoutClick(View view) {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 }

@@ -59,6 +59,13 @@
             android:text="긴급 버튼"
             android:visibility="gone"
             android:layout_margin="20dp"/>
+        <Button
+            android:id="@+id/targetlogoutBtn"
+            android:visibility="gone"
+            android:gravity="center"
+            android:layout_margin="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
 
     </LinearLayout>
