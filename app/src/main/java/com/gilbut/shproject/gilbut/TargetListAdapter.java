@@ -19,6 +19,7 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
     ArrayList<Connection> list;
     Button button;
     Context context;
+    TextView tid;
     public TargetListAdapter( Context context, int resource,  ArrayList<Connection> objects) {
         super(context, resource, objects);
 
@@ -38,7 +39,7 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
 
         final Connection connection = list.get(position);
         if(connection != null){
-            TextView tid = (TextView)v.findViewById(R.id.target_id);
+            tid = (TextView)v.findViewById(R.id.target_id);
             final TextView tpos = (TextView)v.findViewById(R.id.target_pos);
 
 
@@ -69,6 +70,7 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(parent.getContext(), SettingActivity.class);
+                intent.putExtra("targetId", tid.getText());
                 ((Activity)parent.getContext()).startActivityForResult(intent, 1);
                 //Toast.makeText(context, "?", Toast.LENGTH_LONG).show();
             }

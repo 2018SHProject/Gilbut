@@ -17,9 +17,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -204,13 +204,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     }
 
 
-    void openSetting(String targetId){
-
-        Intent intent = new Intent(getApplicationContext(),SettingActivity.class);
-        intent.putExtra("targetId", targetId);
-        startActivityForResult(intent, setting_Result);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -230,6 +223,13 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
                 polygonOptions.strokeWidth(15);
                 polygonOptions.strokeColor(Color.rgb(255, 203, 81));
                 Polygon polygon = map.addPolygon(polygonOptions);
+
+
+                //boolean inside = PolyUtil.containsLocation(targetPoint, polygon , true );
+                // true 면 좌표 안에 존재하는 것
+                // false 면 좌표 안에 존재하지 않는 것
+
+
             }
             else{
                 Toast.makeText(this,"Latlng 안 넘어옴",Toast.LENGTH_LONG).show();
@@ -240,12 +240,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        TextView targetIdTextView = (TextView)item.getActionView().findViewById(id.target_id);
-        openSetting(targetIdTextView.getText().toString());
-        return true;
-    }
 
     public void init(){
 
@@ -294,6 +288,14 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
         listView = (ListView)findViewById(id.TargetList);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+               Connection connection = (Connection)parent.getAdapter().getItem(position);
+               Toast.makeText(getApplicationContext(),connection.rangeRef,Toast.LENGTH_LONG).show();
+            }
+        });
+
 
         connections = new ArrayList<Connection>();
         connectionController.getProtectorConnections(protector.mId, new ConnectionController.OnGetConnectionsListener() {
@@ -303,7 +305,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
                 arrayAdapter = new TargetListAdapter(Pcontext, layout.target_list, connections);
                 listView.setAdapter(arrayAdapter);
-                //TODO: 모가 문제일까요 => 조금뒤에 해결해보겠습니다.
+
             }
 
             @Override
@@ -316,6 +318,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         //나와 연결된 타겟들 받아와서 추가하기
 
     }
+
 
     public void printMap(double lat, double lng){
         final LatLng Loc = new LatLng(lat, lng);
