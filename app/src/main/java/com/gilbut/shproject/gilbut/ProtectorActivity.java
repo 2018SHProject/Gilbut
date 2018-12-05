@@ -204,9 +204,10 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
     }
 
 
-    void openSetting(){
+    void openSetting(String targetId){
 
         Intent intent = new Intent(getApplicationContext(),SettingActivity.class);
+        intent.putExtra("targetId", targetId);
         startActivityForResult(intent, setting_Result);
     }
 
@@ -241,8 +242,8 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-            openSetting();
-
+        TextView targetIdTextView = (TextView)item.getActionView().findViewById(id.target_id);
+        openSetting(targetIdTextView.getText().toString());
         return true;
     }
 
