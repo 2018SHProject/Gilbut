@@ -290,6 +290,8 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             public void onComplete(ArrayList<Connection> connection) {
                 connections.addAll(connection);
 
+                // 여기에 새롭게 printRangeMap하는 함수 추가해서 범위 그리기
+
                 arrayAdapter = new TargetListAdapter(Pcontext, layout.target_list, connections);
                 listView.setAdapter(arrayAdapter);
                // Connection c = listView.getAdapter().getItem(0);
@@ -307,6 +309,17 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
     }
 
+
+
+    public void printRangeMap(ArrayList<LatLng> latLngs){
+        PolygonOptions polygonOptions = new PolygonOptions();
+        polygonOptions.addAll(latLngs);
+        polygonOptions.strokeWidth(15);
+        polygonOptions.strokeColor(Color.rgb(255,203,81));
+        Polygon polygon = map.addPolygon(polygonOptions);
+
+
+    }
 
     public void printMap(double lat, double lng){
         final LatLng Loc = new LatLng(lat, lng);
