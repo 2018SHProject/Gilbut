@@ -10,7 +10,7 @@
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="000님의 연결 요청이 들어왔습니다"
+        android:text="수락하시겠습니까?"
         />
 
 

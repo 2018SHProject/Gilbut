@@ -14,7 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import android.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -189,6 +189,11 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
                 }
             }
         });
+
+        // 백그라운드 서비스 달아보자.
+        Intent intent = new Intent(getApplicationContext(), ObserveService.class);
+        //stopService(intent);
+        startService(intent);
     }
 
     public void checkPer(){
@@ -261,56 +266,8 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
                     case 0 :
                         // 요청 들어 온 상태
-                        new AlertDialog.Builder(getApplicationContext())
-                                .setTitle("<연결 요청 알림>")
-                                .setView(dialview)
-                                .setPositiveButton("연결", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        protector.status = 1;
-                                        // 연결 상태 업데이트
-                                        connectionController.updateConnectionStatus(connection.tId, connection.pId, protector.status, new ConnectionController.OnSetCompleteListener() {
-                                            @Override
-                                            public void onComplete() {
-
-                                            }
-
-                                            @Override
-                                            public void onFailure(String err) {
-
-                                            }
-                                        });
-                                        textView.setText("연결 승인");
-                                        toast.setView(toastview);
-                                        toast.setGravity(Gravity.CENTER,0,0);
-                                        toast.setDuration(Toast.LENGTH_LONG);
-                                        toast.show();
-                                    }
-                                })
-                                .setNegativeButton("거절", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        protector.status = 2;
-                                        //연결상태 업데이트
-                                        connectionController.updateConnectionStatus(connection.tId, connection.pId, protector.status, new ConnectionController.OnSetCompleteListener() {
-                                            @Override
-                                            public void onComplete() {
-
-                                            }
-
-                                            @Override
-                                            public void onFailure(String err) {
-
-                                            }
-                                        });
-                                        textView.setText("연결 거부");
-                                        toast.setView(toastview);
-                                        toast.setGravity(Gravity.CENTER,0,0);
-                                        toast.setDuration(Toast.LENGTH_LONG);
-                                        toast.show();
-                                    }
-                                }).show();
-                        //break;
+                        showAlertDialog(connection.tId, connection.pId);
+                        break;
                     case 1 :
                         // 요청 승인 확인
 
@@ -381,6 +338,79 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
         //나와 연결된 타겟들 받아와서 추가하기
 
+    }
+
+    // 다이얼로그 띄우기.
+    public void showAlertDialog(final String targetId, final String protectorId){
+        if(!ProtectorActivity.this.isFinishing()) {
+            new AlertDialog.Builder(ProtectorActivity.this)
+                    .setTitle("<연결 요청 알림>")
+                    .setMessage(targetId+"가 연결을 요청했습니다.")
+                    .setView(dialview)
+                    .setPositiveButton("연결", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            protector.status = 1;
+                            // 연결 상태 업데이트
+                            connectionController.updateConnectionStatus(targetId, protectorId, protector.status, new ConnectionController.OnSetCompleteListener() {
+                                @Override
+                                public void onComplete() {
+                                    connectionController.getConnection(targetId, protectorId, new ConnectionController.OnGetConnectionListener() {
+                                        @Override
+                                        public void onComplete(Connection connection) {
+                                            arrayAdapter.add(connection);
+                                        }
+
+                                        @Override
+                                        public void onFailure(String err) {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(String err) {
+
+                                }
+                            });
+//                            Observer observer = new Observer();
+//                            observer.setObservingLocation(targetId, new Observer.OnObservedDataChange() {
+//                                @Override
+//                                public void OnDataChange(Object object) {
+//
+//                                }
+//                            });
+                            textView.setText("연결 승인");
+                            toast.setView(toastview);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                    })
+                    .setNegativeButton("거절", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            protector.status = 2;
+                            //연결상태 업데이트
+                            connectionController.updateConnectionStatus(targetId, protectorId, protector.status, new ConnectionController.OnSetCompleteListener() {
+                                @Override
+                                public void onComplete() {
+
+                                }
+
+                                @Override
+                                public void onFailure(String err) {
+
+                                }
+                            });
+                            textView.setText("연결 거부");
+                            toast.setView(toastview);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                    }).show();
+        }
     }
 
 

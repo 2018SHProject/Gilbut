@@ -150,6 +150,7 @@ public class Member {
         protectorValues.put("yId", "");
         protectorRef2.child(uid).child("mId").setValue(protectorValues.get("mId"));
         protectorRef2.child(uid).child("yId").setValue(targetValues.get("yId"));
+        targetRef2.child(uid).child("prevent").setValue(false);
     }
 
     public void getLocation(final String targetId, final OnGetLocationListener onGetLocationListener){
@@ -300,6 +301,58 @@ public class Member {
                     TargetMember target = snapshot.getValue(TargetMember.class);
                     if (target != null && target.mId.equals(targetId)) {
                         onGetEmergencyListener.onComplete(target.emergency);
+                    }else{
+                        onGetEmergencyListener.onFailure("타겟 없음");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onGetEmergencyListener.onFailure(databaseError.toString());
+            }
+        });
+    }
+
+    //prevent 설정
+    public void setPrevent(final String protectorId, final boolean prevent, final OnSetCompleteListener onSetCompleteListener){
+        final DatabaseReference ref = db.getReference("protector");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    ProtectorMember protector = snapshot.getValue(ProtectorMember.class);
+                    if (protector != null && protector.mId.equals(protectorId)) {
+                        snapshot.getRef().child("emergency").setValue(prevent, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if(onSetCompleteListener!=null){
+                                    onSetCompleteListener.onComplete();
+                                }
+                            }
+                        });
+                    }else{
+                        onSetCompleteListener.onFailure("no target");
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onSetCompleteListener.onFailure("on cancel");
+            }
+        });
+    }
+
+    // prevent 가져오기
+    public void getPrevent(final String protectorId, final OnGetEmergencyListener onGetEmergencyListener){
+        DatabaseReference ref = db.getReference("protector");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    ProtectorMember protector = snapshot.getValue(ProtectorMember.class);
+                    if (protector != null && protector.mId.equals(protectorId)) {
+                        onGetEmergencyListener.onComplete(protector.prevent);
                     }else{
                         onGetEmergencyListener.onFailure("타겟 없음");
                     }

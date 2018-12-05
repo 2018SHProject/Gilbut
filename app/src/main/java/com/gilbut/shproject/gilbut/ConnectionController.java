@@ -28,7 +28,7 @@ public class ConnectionController {
         DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
         Map<String, Object> connectionUpdates = new HashMap<>();
         connectionUpdates.put("status", status);
-        ref.updateChildren(connectionUpdates, new DatabaseReference.CompletionListener() {
+        ref.child("status").setValue(status, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (onUpdateCompleteListener != null) {
@@ -36,6 +36,14 @@ public class ConnectionController {
                 }
             }
         });
+//        ref.updateChildren(connectionUpdates, new DatabaseReference.CompletionListener() {
+//            @Override
+//            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+//                if (onUpdateCompleteListener != null) {
+//                    onUpdateCompleteListener.onComplete();
+//                }
+//            }
+//        });
     }
 
     // 연결 통째로 업데이트

@@ -1,6 +1,7 @@
 package com.gilbut.shproject.gilbut;
 
 import com.gilbut.shproject.gilbut.model.Connection;
+import com.gilbut.shproject.gilbut.model.TargetMember;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -36,13 +37,30 @@ public class Observer {
         });
     }
 
-    public void setObservingConnectionPrevent(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
-        ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".","")).child("prevent");
-        eventListener = ref.addValueEventListener(new ValueEventListener() {
+    public void setObservingConnectionEmergency(final String targetId, final OnObservedDataChange onObservedDataChange){
+        ref = db.getReference("target");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean prevent =  (boolean)dataSnapshot.getValue();
-                onObservedDataChange.OnDataChange(prevent);
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    TargetMember target = snapshot.getValue(TargetMember.class);
+                    if(target.mId.equals(targetId)){
+                        DatabaseReference emergencyRef = snapshot.getRef().child("emergency");
+                        eventListener = emergencyRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                boolean emergency =  (boolean)dataSnapshot.getValue();
+                                onObservedDataChange.OnDataChange(emergency);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
             }
 
             @Override
@@ -50,15 +68,33 @@ public class Observer {
 
             }
         });
+
     }
 
-    public void setObservingConnectionAlarm(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
-        ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".","")).child("alarm");
-        eventListener = ref.addValueEventListener(new ValueEventListener() {
+    public void setObservingConnectionAlarm(final String targetId, final OnObservedDataChange onObservedDataChange){
+        ref = db.getReference("target");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean alarm =  (boolean)dataSnapshot.getValue();
-                onObservedDataChange.OnDataChange(alarm);
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    TargetMember target = snapshot.getValue(TargetMember.class);
+                    if(target.mId.equals(targetId)){
+                        DatabaseReference alarmRef = snapshot.getRef().child("alarm");
+                        eventListener = alarmRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                boolean alarm =  (boolean)dataSnapshot.getValue();
+                                onObservedDataChange.OnDataChange(alarm);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
             }
 
             @Override
@@ -66,16 +102,34 @@ public class Observer {
 
             }
         });
+
     }
 
-    public void setObservingLocation(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
-        ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".","")).child("location");
-        eventListener = ref.addValueEventListener(new ValueEventListener() {
+    public void setObservingLocation(final String targetId, final OnObservedDataChange onObservedDataChange){
+        ref = db.getReference("target");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Double latitude = dataSnapshot.child("latitude").getValue(Double.class);
-                Double longitude = dataSnapshot.child("longitude").getValue(Double.class);
-                onObservedDataChange.OnDataChange(new LatLng(latitude, longitude));
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    TargetMember target = snapshot.getValue(TargetMember.class);
+                    if(target.mId.equals(targetId)){
+                        DatabaseReference locationRef = snapshot.getRef().child("location");
+                        eventListener = locationRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                double latitude = (double)dataSnapshot.child("latitude").getValue(Double.class);
+                                double longitude = (double)dataSnapshot.child("longitude").getValue(Double.class);
+                                onObservedDataChange.OnDataChange(new LatLng(latitude, longitude));
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
             }
 
             @Override
@@ -118,8 +172,10 @@ public class Observer {
     }
 
     public void removeObserver(){
-        ref.removeEventListener(eventListener);
-        ref.removeEventListener(childEventListener);
+        if(eventListener != null)
+            ref.removeEventListener(eventListener);
+        if(childEventListener != null)
+            ref.removeEventListener(childEventListener);
     }
 
     public interface OnObservedDataChange{
