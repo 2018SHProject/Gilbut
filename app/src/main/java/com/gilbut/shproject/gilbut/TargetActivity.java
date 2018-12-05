@@ -21,7 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gilbut.shproject.gilbut.model.Connection;
-import com.google.android.gms.maps.model.LatLng;
+        import com.github.clans.fab.FloatingActionMenu;
+        import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -47,7 +48,10 @@ public class TargetActivity extends AppCompatActivity {
     Button eBtn;                                                                //긴급버튼
     TextView noProtector;                                                       //연결된 보호자가 없을 때 띄울 메세지
     TextView tWait;                                                             //보호자의 수락을 기다릴 때 보일 메세지.
-    FloatingActionButton fab;                                                   //Fab
+    FloatingActionMenu fmenu;
+    com.github.clans.fab.FloatingActionButton add;
+    com.github.clans.fab.FloatingActionButton list;
+
     double latitude;
     double longitude;
     ArrayList<Connection> plist;                                                //연결된 보호자 리스트
@@ -107,8 +111,10 @@ public class TargetActivity extends AppCompatActivity {
         eBtn = (Button)findViewById(R.id.emergencyBtn);
         noProtector = (TextView)findViewById(R.id.noProtector);
         tWait = (TextView)findViewById(R.id.tWait);
-        fab = (FloatingActionButton)findViewById(R.id.fab);
         connectionController = new ConnectionController();
+        fmenu = (FloatingActionMenu)findViewById(R.id.fmenu);
+        add = (com.github.clans.fab.FloatingActionButton)findViewById(R.id.add);
+        list = (com.github.clans.fab.FloatingActionButton)findViewById(R.id.list);
         member = new Member();
         plist = new ArrayList<>();
         // 우용 추가
@@ -120,7 +126,7 @@ public class TargetActivity extends AppCompatActivity {
         target.set_Id(auth.getCurrentUser().getEmail());
 
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog ad = new AlertDialog.Builder(TargetActivity.this).create();
@@ -226,6 +232,13 @@ public class TargetActivity extends AppCompatActivity {
 
                 // 창 띄우기
                 ad.show();
+            }
+        });
+
+        list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //리스트 띄우기. 이것도 다이얼로그로?
             }
         });
 

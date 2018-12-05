@@ -71,17 +71,40 @@
     </LinearLayout>
 
 
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fmenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|bottom"
-        android:layout_margin="30dp"
-        android:clickable="true"
-        app:backgroundTint="@color/cast_intro_overlay_button_background_color"
-        app:fabSize="normal"
-        app:srcCompat="@drawable/add" />
+        android:layout_gravity="bottom|right"
+        app:menu_fab_size="normal"
+
+        >
+
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+
+            >
+
+        </com.github.clans.fab.FloatingActionButton>
+
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+            >
+
+        </com.github.clans.fab.FloatingActionButton>
+
+
+    </com.github.clans.fab.FloatingActionMenu>
+
+
 
 
 </android.support.design.widget.CoordinatorLayout>
