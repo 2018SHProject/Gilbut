@@ -55,7 +55,7 @@ public class TargetActivity extends AppCompatActivity {
     // 우용 추가
     Button logoutBtn;                                                           // 로그아웃 버튼
 
-    int statuss;                                                                //연결상태
+    int isConnected;                                                                //연결상태
 
     //-1 : 연결이 아예 없는 경우
     //0 : 커넥션은 있으나(요청은 보냈으나) 어느 누구하고도 연결되지 않은 경우
@@ -113,7 +113,7 @@ public class TargetActivity extends AppCompatActivity {
         plist = new ArrayList<>();
         // 우용 추가
         logoutBtn = (Button)findViewById(R.id.targetlogoutBtn);
-        statuss = -1;
+        isConnected= -1;
 
         // Auth를 이용해서 아이디 받아오기.
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -162,15 +162,34 @@ public class TargetActivity extends AppCompatActivity {
                                                     Toast.makeText(getApplicationContext(), "status: "+status, Toast.LENGTH_LONG).show();
                                                     switch(status){
                                                         case 1:
-                                                            // TODO: 목록 갱신 필요.
+                                                            for(int i = 0; i < plist.size(); i++){
+                                                                if(plist.get(i).pId.equals(p_Id)){
+                                                                    plist.get(i).status = (long)1;
+                                                                    break;
+                                                                }
+                                                            }
                                                             break;
                                                         case 2:
-//                                                          showRefused();
                                                             statusObserver.removeObserver();
                                                             connectionController.removeConnection(target.get_Id(), p_Id, new ConnectionController.OnRemoveListener() {
                                                                 @Override
                                                                 public void onCompletet() {
                                                                     //삭제 완료후 처리.
+                                                                    showRefused(p_Id);
+                                                                    for(int i = 0; i < plist.size(); i++){
+                                                                        if(plist.get(i).pId.equals(p_Id)){
+                                                                            plist.remove(i);
+                                                                            int size = plist.size();
+                                                                            if(size == 0) {
+                                                                                onBtn.setVisibility(View.GONE);
+                                                                                offBtn.setVisibility(View.GONE);
+                                                                                tWait.setVisibility(View.GONE);
+                                                                                eBtn.setVisibility(View.GONE);
+                                                                                noProtector.setVisibility(View.VISIBLE);
+                                                                            }
+                                                                            break;
+                                                                        }
+                                                                    }
                                                                 }
                                                             });
                                                             break;
@@ -234,23 +253,20 @@ public class TargetActivity extends AppCompatActivity {
                     plist.add(connection);
                     if(!check) {
                         if (connection.status.intValue() == 1) {
-                            statuss = 1;
+                            isConnected = 1;
                             check = true;
                         }
                     }
                     if(connection.status.intValue() == 2){
                         String pid = connection.pId;
                         showRefused(pid);
-                        //1명 대기중인데 그게 거절인경우. 그러면 그거를 showrefused에서 pid에 해당하는 status를 -1로 바꾸고, statuss를 -1로 바꿔야되는데
-                        //그거를 어떻게 판별하지? TODO 이건 내가 고민하는거임 @동현.
                     }
 
                 }
 
-                if(statuss != 1)            //연결은 있으나 완료가 되지 않은 경우(어느 누구와도)
-                    statuss = 0;
+                if(isConnected != 1)            //연결은 있으나 완료가 되지 않은 경우(어느 누구와도)
+                    isConnected = 0;
 
-                //TODO @동현 리스트 띄우기
                 checkConnection();
         }
 
@@ -259,7 +275,7 @@ public class TargetActivity extends AppCompatActivity {
                 if(err.equals("NO_DATA")){
                     // 연결이 없을 때.
                     target.setStatus(-1);
-                    statuss = -1;
+                    isConnected = -1;
                     target.setAlarm(false);
                     Toast.makeText(getApplicationContext(), "NO_DATA", Toast.LENGTH_LONG).show();
                 }
@@ -279,13 +295,13 @@ public class TargetActivity extends AppCompatActivity {
         fab.show();
         setLocation();
 
-        if(statuss == 1) {
+        if(isConnected == 1) {
             //연결이 완료되어있는 경우
             showToggle();
-        }else if(statuss == 0){
+        }else if(isConnected == 0){
             //어느 누구와도 연결이 되지 않은 경우
             tWait.setVisibility(View.VISIBLE);
-        }else if (statuss == -1){
+        }else if (isConnected == -1){
             //연결 자체가 없는 경우
             noProtector.setVisibility(View.VISIBLE);
         }else{
@@ -392,9 +408,7 @@ public class TargetActivity extends AppCompatActivity {
 
     public void showRefused(String pid){
         //연결요청을 거부당했다는 팝업을 띄운다.
-//        target.setStatus(-1);
 //        noProtector.setVisibility(View.VISIBLE);
-        //TODO: @동현: 이거는 연결을 하는 순간 status값이 -1로 바뀌는지 검사하는 Observer를 만드는걸로 할게. 이 함수에서는 팝업만 여는걸로 하는게 어떠심.
         Toast.makeText(getApplicationContext(),pid+"님이 연결 요청을 거부했습니다.",Toast.LENGTH_SHORT).show();
     }
 
