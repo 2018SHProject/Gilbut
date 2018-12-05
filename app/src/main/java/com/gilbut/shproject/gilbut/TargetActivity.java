@@ -333,7 +333,6 @@ public class TargetActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 target.setEmergency(true);
-                //TODO @소은 확인 후 emegency를 false로 하는건 보호자클래스에서 해야됨!
                 Member member = new Member();
                 member.setEmergency(target.get_Id(), true, new Member.OnSetCompleteListener() {
                     @Override
