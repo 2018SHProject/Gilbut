@@ -19,6 +19,7 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
     ArrayList<Connection> list;
     Button button;
     Context context;
+    LatLng latLng;
     TextView tid;
     public TargetListAdapter( Context context, int resource,  ArrayList<Connection> objects) {
         super(context, resource, objects);
@@ -53,6 +54,7 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
                     @Override
                     public void onComplete(LatLng location) {
                         if(location != null)
+                            latLng = location;
                             tpos.setText(String.valueOf(location.latitude) + ", " +String.valueOf(location.longitude));
                     }
 
@@ -77,4 +79,5 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
         });
         return v;
     }
+
 }
