@@ -53,9 +53,9 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
                 member.getLocation(connection.tId, new Member.OnGetLocationListener() {
                     @Override
                     public void onComplete(LatLng location) {
-                        if(location != null)
-                            latLng = location;
-                            tpos.setText(String.valueOf(location.latitude) + ", " +String.valueOf(location.longitude));
+                        if(location != null) {
+                            tpos.setText(String.valueOf(location.latitude) + ", " + String.valueOf(location.longitude));
+                        }
                     }
 
                     @Override

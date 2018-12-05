@@ -15,6 +15,7 @@ import android.util.Range;
 import android.view.View;
 import android.widget.Button;
 
+import com.gilbut.shproject.gilbut.model.Connection;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
@@ -89,6 +91,8 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
     public void init() {
         Bundle extras = getIntent().getExtras();
         targetId = extras.getString("targetId");
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        final String protectorId =  auth.getCurrentUser().getEmail();
 
         polygonOptions = new PolygonOptions();
 
@@ -104,7 +108,31 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
                 polygonOptions.strokeColor(Color.rgb(255,203,81));
                 polygon = map.addPolygon(polygonOptions);
 
-                RangeController range = new RangeController(arrayPoints);
+                //레인지 추가
+                RangeController range = new RangeController();
+                range.updateRange(arrayPoints, targetId, protectorId, new RangeController.OnSetRangeListener() {
+                    @Override
+                    public void onComplete(String rangeRef) {
+                        ConnectionController connectionController = new ConnectionController();
+                        connectionController.updateConnectionRangeReference(targetId, protectorId, rangeRef, new ConnectionController.OnSetCompleteListener() {
+                            @Override
+                            public void onComplete() {
+                                // 범위 갱신 성공.
+                            }
+
+                            @Override
+                            public void onFailure(String err) {
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(String err) {
+
+                    }
+                });
+
                 Intent result = new Intent();
                 //result.putExtra("setting", range);
                 result.putExtra("setting", arrayPoints);
@@ -151,22 +179,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
         LatLng Loc = new LatLng(newLoc.getLatitude(), newLoc.getLongitude());
         map.clear();
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
-    }
-
-    // 범위 업데이트 하는 함수.
-    void updateRange(String targetId, String protectorId, String rangeRef, ArrayList<LatLng> range){
-        RangeController rangeController = new RangeController();
-        rangeController.updateRange(range, targetId, protectorId, new RangeController.OnSetRangeListener() {
-            @Override
-            public void onComplete(String rangeRef) {
-                //TODO: 소ㅓ은 여기 할차례.
-            }
-
-            @Override
-            public void onFailure(String err) {
-
-            }
-        });
     }
 
     @Override

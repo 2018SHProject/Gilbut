@@ -36,6 +36,38 @@ public class Observer {
         });
     }
 
+    public void setObservingConnectionPrevent(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
+        ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".","")).child("prevent");
+        eventListener = ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean prevent =  (boolean)dataSnapshot.getValue();
+                onObservedDataChange.OnDataChange(prevent);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void setObservingConnectionAlarm(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
+        ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".","")).child("alarm");
+        eventListener = ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean alarm =  (boolean)dataSnapshot.getValue();
+                onObservedDataChange.OnDataChange(alarm);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public void setObservingLocation(String targetId, String protectorId, final OnObservedDataChange onObservedDataChange){
         ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".","")).child("location");
         eventListener = ref.addValueEventListener(new ValueEventListener() {

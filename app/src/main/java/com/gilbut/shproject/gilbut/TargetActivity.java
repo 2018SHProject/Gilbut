@@ -55,6 +55,8 @@ public class TargetActivity extends AppCompatActivity {
     // 우용 추가
     Button logoutBtn;                                                           // 로그아웃 버튼
 
+    LocationService locationService;
+
     int statuss;                                                                //연결상태
 
     //-1 : 연결이 아예 없는 경우
@@ -97,6 +99,14 @@ public class TargetActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onDestroy() {
+        //백그라운드에서 로케이션 보내게 한번 만들어봄.
+        Intent serviceIntent = new Intent(getApplicationContext(),LocationService.class);
+        startService(serviceIntent);
+        super.onDestroy();
+    }
+
     public void init(){
         //MainActivity에서 넘긴 정보를 가지고 DB에 저장되어있는 대상 / 연결정보를 가져온다.
 
@@ -119,6 +129,10 @@ public class TargetActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         target.set_Id(auth.getCurrentUser().getEmail());
 
+        //위치 보내는 백그라운드 서비스 종료. 포어그라운드일땐 종료하고 백그라운드일때 실행해보게.
+        locationService = new LocationService();
+        Intent serviceIntent = new Intent(getApplicationContext(),LocationService.class);
+        stopService(serviceIntent);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -253,8 +253,82 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         observer.setObserveringNewConnection(protector.mId, new Observer.OnObservedDataChange() {
             @Override
             public void OnDataChange(Object object) {
-                Connection connection = (Connection)object;
-                //TODO: 여기서 연결하겠냐는 팝업 띄우면될거야. connection 정보에 보호자 정보도 있구. 연결 오키 하면 연결 status 1로 바꿔주기도 잊지말기!
+                final Connection connection = (Connection)object;
+                protector.status = connection.status.intValue();
+                // switch 안의 것이 나중에는 Connection의 변수 중 하나가 되어야 겟디요
+                // 우선 보기 쉽게 한 곳에 몰아 넣었음
+                switch (protector.status){
+
+                    case 0 :
+                        // 요청 들어 온 상태
+                        new AlertDialog.Builder(getApplicationContext())
+                                .setTitle("<연결 요청 알림>")
+                                .setView(dialview)
+                                .setPositiveButton("연결", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        protector.status = 1;
+                                        // 연결 상태 업데이트
+                                        connectionController.updateConnectionStatus(connection.tId, connection.pId, protector.status, new ConnectionController.OnSetCompleteListener() {
+                                            @Override
+                                            public void onComplete() {
+
+                                            }
+
+                                            @Override
+                                            public void onFailure(String err) {
+
+                                            }
+                                        });
+                                        textView.setText("연결 승인");
+                                        toast.setView(toastview);
+                                        toast.setGravity(Gravity.CENTER,0,0);
+                                        toast.setDuration(Toast.LENGTH_LONG);
+                                        toast.show();
+                                    }
+                                })
+                                .setNegativeButton("거절", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        protector.status = 2;
+                                        //연결상태 업데이트
+                                        connectionController.updateConnectionStatus(connection.tId, connection.pId, protector.status, new ConnectionController.OnSetCompleteListener() {
+                                            @Override
+                                            public void onComplete() {
+
+                                            }
+
+                                            @Override
+                                            public void onFailure(String err) {
+
+                                            }
+                                        });
+                                        textView.setText("연결 거부");
+                                        toast.setView(toastview);
+                                        toast.setGravity(Gravity.CENTER,0,0);
+                                        toast.setDuration(Toast.LENGTH_LONG);
+                                        toast.show();
+                                    }
+                                }).show();
+                        //break;
+                    case 1 :
+                        // 요청 승인 확인
+
+
+                        initFire();
+                        break;
+                    case 2 :
+
+                        // 거절 알림 후 -1로 변경
+                        break;
+
+                    case -1 :
+                        // 미연결 상태
+
+
+                        break;
+
+                }
             }
         });
 

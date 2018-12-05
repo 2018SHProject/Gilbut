@@ -28,15 +28,12 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCaOaVuOJsDszzQjeU-e_lTUNnHaLEOsrU" />
+            android:value="AIzaSyCh3oHzBZFNjBvZiz4gpJGJLv-JdxT6JXY"/>
 
         <activity android:name=".TargetActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".ProtectorActivity" />
-
-        <activity android:name=".TestActivity" >
-
-        </activity>
+        <activity android:name=".TestActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,7 +41,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingActivity"></activity>
+        <activity android:name=".SettingActivity" />
+
+        <service
+            android:name=".LocationService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".ObserveService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

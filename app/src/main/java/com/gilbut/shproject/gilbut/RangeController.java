@@ -99,11 +99,12 @@ public class RangeController{
     // 범위 업데이트 - range reference와 함께.
     public void updateRange(final ArrayList<LatLng> range, String rangeRef, final OnSetRangeListener setRangeListener) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
-        final DatabaseReference ref = db.getReference(rangeRef);
-        final DatabaseReference newRef = db.getReference("range").push();
-        ref.removeValue(new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+        if(!rangeRef.equals("")){
+            final DatabaseReference ref = db.getReference(rangeRef);
+            final DatabaseReference newRef = db.getReference("range").push();
+            ref.removeValue(new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 ArrayList<Map<String, Double>> mapRange = new ArrayList<>();
                 for(LatLng latLng : range){
                     HashMap<String, Double> pos = new HashMap<>();
@@ -111,7 +112,7 @@ public class RangeController{
                     pos.put("longitude",latLng.longitude);
                     mapRange.add(pos);
                 }
-                final String uid = ref.getKey();
+                final String uid = newRef.getKey();
                 newRef.setValue(mapRange).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -123,8 +124,30 @@ public class RangeController{
                         setRangeListener.onFailure(e.toString());
                     }
                 });
+                }
+            });
+        }else{
+            final DatabaseReference newRef = db.getReference("range").push();
+            ArrayList<Map<String, Double>> mapRange = new ArrayList<>();
+            for(LatLng latLng : range){
+                HashMap<String, Double> pos = new HashMap<>();
+                pos.put("latitude", latLng.latitude);
+                pos.put("longitude",latLng.longitude);
+                mapRange.add(pos);
             }
-        });
+            final String uid = newRef.getKey();
+            newRef.setValue(mapRange).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    setRangeListener.onComplete("range/"+uid);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    setRangeListener.onFailure(e.toString());
+                }
+            });
+        }
 
     }
 
