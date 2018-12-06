@@ -51,8 +51,8 @@
             android:name=".ObserveService"
             android:enabled="true"
             android:exported="true" />
-
         <activity android:name=".ProtectorListActivity"></activity>
+
     </application>
 
 </manifest>

@@ -1,10 +1,12 @@
 package com.gilbut.shproject.gilbut;
 
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -184,9 +186,36 @@ public class TestActivity extends AppCompatActivity {
 //
 //        });
 
-        Context context = TestActivity.this;
-        createNotification("짜잔", "그래그래", context);
+//        Context context = TestActivity.this;
+//        createNotification("짜잔", "그래그래", context);
 
+        showAEmergencyDialog("tazozzang@gamil.com");
+
+
+    }
+
+    public void showAEmergencyDialog(final String targetId){
+        new AlertDialog.Builder(TestActivity.this)
+                .setTitle("<긴급!!>")
+                .setMessage(targetId+"가 긴급신로를 보냈했습니다.")
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 긴급 상태 업데이트
+                        Member member = new Member();
+                        member.setEmergency(targetId, false, new Member.OnSetCompleteListener() {
+                            @Override
+                            public void onComplete() {
+
+                            }
+
+                            @Override
+                            public void onFailure(String err) {
+
+                            }
+                        });
+                    }
+                }).show();
 
     }
     private NotificationManager notifManager;

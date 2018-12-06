@@ -82,7 +82,6 @@ public class ObserveService extends Service {
                             boolean emergency = (boolean)object;
                             if(emergency){
                                 createNotification(connection.tId+"의 긴급신호!!!", connection.tId+"가 긴급 신호를 보냈습니다!!", ObserveService.this);
-                                showAEmergencyDialog(connection.tId);
                             }
                         }
                     });
@@ -127,7 +126,7 @@ public class ObserveService extends Service {
                 notifManager.createNotificationChannel(mChannel);
             }
             builder = new NotificationCompat.Builder(context, id);
-            intent = new Intent(context, MainActivity.class);
+            intent = new Intent(context, ProtectorActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
             builder.setContentTitle(notiTitle)                            // required
@@ -141,7 +140,7 @@ public class ObserveService extends Service {
         }
         else {
             builder = new NotificationCompat.Builder(context, id);
-            intent = new Intent(context, MainActivity.class);
+            intent = new Intent(context, ProtectorActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
             builder.setContentTitle(notiTitle)                            // required
@@ -158,29 +157,4 @@ public class ObserveService extends Service {
         notifManager.notify(NOTIFY_ID, notification);
     }
 
-    // 다이얼로그 띄우기.
-    public void showAEmergencyDialog(final String targetId){
-            new AlertDialog.Builder(ObserveService.this)
-                    .setTitle("<긴급!!>")
-                    .setMessage(targetId+"가 긴급신로를 보냈했습니다.")
-                    .setPositiveButton("연결", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // 긴급 상태 업데이트
-                           Member member = new Member();
-                           member.setEmergency(targetId, false, new Member.OnSetCompleteListener() {
-                               @Override
-                               public void onComplete() {
-
-                               }
-
-                               @Override
-                               public void onFailure(String err) {
-
-                               }
-                           });
-                        }
-                    });
-
-    }
 }
