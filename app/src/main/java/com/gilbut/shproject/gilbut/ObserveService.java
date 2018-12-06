@@ -65,7 +65,6 @@ public class ObserveService extends Service {
                         @Override
                         public void OnDataChange(final Object object) {
                             final LatLng location = (LatLng)object;
-                            Toast.makeText(ObserveService.this, "대상 위치1"+location, Toast.LENGTH_SHORT).show();
                             final Member member = new Member();
                                 // 범위 밖으로 가는거 알람인지 아니면 들어오는거 알람인지.
                                 member.getPrevent(myId, new Member.OnGetPreventListener() {
@@ -78,11 +77,8 @@ public class ObserveService extends Service {
                                                 @Override
                                                 public void onComplete(ArrayList<LatLng> range) {
                                                     //*********결과에 따라 노티 표시.*************
-                                                    Toast.makeText(ObserveService.this, "대상 위치"+range, Toast.LENGTH_SHORT).show();
                                                     boolean result = checkLeave(location,range,prevent );
-                                                    Toast.makeText(ObserveService.this, "결과는: "+result, Toast.LENGTH_SHORT).show();
                                                     if(!result){
-                                                        Toast.makeText(ObserveService.this, "대상 위치!!", Toast.LENGTH_SHORT).show();
                                                         if(prevent){
                                                             createNotification(connection.tId+"가 범위를 벗어났습니다.",connection.tId+"가 범위를 벗어났습니다.",ObserveService.this);
                                                         }else{

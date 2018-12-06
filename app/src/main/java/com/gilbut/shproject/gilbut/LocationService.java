@@ -62,7 +62,7 @@ public class LocationService extends Service {
 
                 @Override
                 public void onComplete() {
-                    Toast.makeText(getApplicationContext(),"위도 " +latitude+" 경도 "+ longitude,Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),"위도 " +latitude+" 경도 "+ longitude,Toast.LENGTH_SHORT).show();
                 }
 
                 @Override

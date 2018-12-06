@@ -23,7 +23,8 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.
+        Toast;
 import android.widget.ToggleButton;
 
 import com.gilbut.shproject.gilbut.model.Connection;
@@ -221,9 +222,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             //RangeController latLngs = bundle.getParcelable("setting");
             ArrayList<LatLng> latLngs = data.getParcelableArrayListExtra("setting");
             if(latLngs != null) {
-                Toast.makeText(this,"Latlng 넘어옴"  ,Toast.LENGTH_LONG).show();
-
-
+                // LatLng 넘어옴
                 PolygonOptions polygonOptions = new PolygonOptions();
                polygonOptions.addAll(latLngs);
                 polygonOptions.strokeWidth(15);
@@ -233,10 +232,9 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
             }
             else{
-                Toast.makeText(this,"Latlng 안 넘어옴",Toast.LENGTH_LONG).show();
+                //Latlng 안 넘어옴
 
             }
-            Toast.makeText(this,data.getStringExtra("test"), Toast.LENGTH_LONG).show();
 
         }
     }
@@ -251,7 +249,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         // Auth에서 받아오도록 수정완료.
         FirebaseAuth auth = FirebaseAuth.getInstance();
         protector.mId = auth.getCurrentUser().getEmail();
-        Toast.makeText(this, protector.mId, Toast.LENGTH_SHORT).show();
         protector.status = 1;
 
         // 보호자에게 연결을 시도할 때마다 실행!

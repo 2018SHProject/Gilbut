@@ -171,15 +171,13 @@ public class TargetActivity extends AppCompatActivity {
                                     connectionController.addNewConnection(target.get_Id(), p_Id, 0, new ConnectionController.OnSetCompleteListener() {
                                         @Override
                                         public void onComplete() {
-                                            //새로운 연결 생성 완료.
-                                            Toast.makeText(getApplicationContext(), "요청완료", Toast.LENGTH_SHORT).show();
+                                            //새로운 연결 생성 완료
                                             // status값이 바뀔 때마다 검사할 Observer 등록.
                                             final Observer statusObserver = new Observer();
                                             statusObserver.setObservingConnectionStatus(target.get_Id(), p_Id, new Observer.OnObservedDataChange() {
                                                 @Override
                                                 public void OnDataChange(Object object) {
                                                     int status = (int)object;
-                                                    Toast.makeText(getApplicationContext(), "status: "+status, Toast.LENGTH_LONG).show();
                                                     switch(status){
                                                         case 1:
                                                             for(int i = 0; i < plist.size(); i++){
@@ -307,7 +305,6 @@ public class TargetActivity extends AppCompatActivity {
                     target.setStatus(-1);
                     isConnected = -1;
                     target.setAlarm(false);
-                    Toast.makeText(getApplicationContext(), "NO_DATA", Toast.LENGTH_LONG).show();
                 }
                 checkConnection();
             }
@@ -365,7 +362,7 @@ public class TargetActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(String err) {
-                        Toast.makeText(getApplicationContext(),"BtnOn 실패",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),"BtnOn 실패",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -386,7 +383,7 @@ public class TargetActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(String err) {
-                        Toast.makeText(getApplicationContext(),"BtnOff 실패",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),"BtnOff 실패",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -455,7 +452,7 @@ public class TargetActivity extends AppCompatActivity {
                         member.updateLocation(target.get_Id(), new LatLng(latitude, longitude), new Member.OnSetCompleteListener() {
                             @Override
                             public void onComplete() {
-                                Toast.makeText(getApplicationContext(), "위도 " + latitude + " 경도 " + longitude, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), "위도 " + latitude + " 경도 " + longitude, Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
