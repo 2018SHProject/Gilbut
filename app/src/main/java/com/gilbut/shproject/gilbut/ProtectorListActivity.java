@@ -22,7 +22,8 @@ public class ProtectorListActivity extends AppCompatActivity {
         Intent intent = getIntent();
         arrayList = (ArrayList)intent.getSerializableExtra("list");
 
-        listView = (ListView)findViewById(R.id.list);
+
+        listView = (ListView)findViewById(R.id.listview);
 
         protectorListAdapter = new ProtectorListAdapter(this,R.layout.protector_list,arrayList);
         listView.setAdapter(protectorListAdapter);
