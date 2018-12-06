@@ -29,5 +29,7 @@ public class ProtectorListActivity extends AppCompatActivity {
 
         protectorListAdapter = new ProtectorListAdapter(this,R.layout.protector_list,arrayList);
         listView.setAdapter(protectorListAdapter);
+
+
     }
 }

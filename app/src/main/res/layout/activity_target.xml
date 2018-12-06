@@ -83,6 +83,8 @@
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/add"
+            android:src="@drawable/add"
+            android:scaleType="fitXY"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fabSize="mini"
@@ -94,6 +96,8 @@
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/list"
+            android:scaleType="fitXY"
+            android:src="@drawable/list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fabSize="mini"

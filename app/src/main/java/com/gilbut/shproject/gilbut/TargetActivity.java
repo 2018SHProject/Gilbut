@@ -316,13 +316,11 @@ public class TargetActivity extends AppCompatActivity {
 
     public void checkConnection(){
         //status를 확인해서 각각 상황에 맞는 작업을 수행한다.
-//        int status = target.getStatus();
         onBtn.setVisibility(View.GONE);
         offBtn.setVisibility(View.GONE);
         tWait.setVisibility(View.GONE);
         eBtn.setVisibility(View.GONE);
         noProtector.setVisibility(View.GONE);
-        //fab.show(); //TODO: ??여기서 오류가 나는데 이게 뭐야?
         setLocation();
 
         if(isConnected == 1) {
@@ -438,7 +436,6 @@ public class TargetActivity extends AppCompatActivity {
 
     public void showRefused(String pid){
         //연결요청을 거부당했다는 팝업을 띄운다.
-//        noProtector.setVisibility(View.VISIBLE);
         Toast.makeText(getApplicationContext(),pid+"님이 연결 요청을 거부했습니다.",Toast.LENGTH_SHORT).show();
     }
 
