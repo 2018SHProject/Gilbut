@@ -115,6 +115,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED){
             checkPer();
+            init();
             // 퍼미션 허용
         }
 

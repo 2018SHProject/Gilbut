@@ -448,12 +448,22 @@ public class TargetActivity extends AppCompatActivity {
             longitude = location.getLongitude();                                //경도 받아오기
             target.setLocation(latitude,longitude);                             //target에 저장
             //db에도 저장
-
-            member.updateLocation(target.get_Id(), new LatLng(latitude,longitude), new Member.OnSetCompleteListener(){
-
+            member.getAlarm(target.get_Id(), new Member.OnGetAlarmListener() {
                 @Override
-                public void onComplete() {
-                    Toast.makeText(getApplicationContext(),"위도 " +latitude+" 경도 "+ longitude,Toast.LENGTH_SHORT).show();
+                public void onComplete(boolean alarm) {
+                    if (alarm) {
+                        member.updateLocation(target.get_Id(), new LatLng(latitude, longitude), new Member.OnSetCompleteListener() {
+                            @Override
+                            public void onComplete() {
+                                Toast.makeText(getApplicationContext(), "위도 " + latitude + " 경도 " + longitude, Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(String err) {
+
+                            }
+                        });
+                    }
                 }
 
                 @Override

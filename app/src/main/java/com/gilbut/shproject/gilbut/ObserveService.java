@@ -1,14 +1,20 @@
 package com.gilbut.shproject.gilbut;
 
+import android.app.AlertDialog;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.Toast;
 
 import com.gilbut.shproject.gilbut.model.Connection;
@@ -19,7 +25,7 @@ import java.util.ArrayList;
 
 public class ObserveService extends Service {
     String myId;
-    NotificationManager Notifi_M;
+    NotificationManager notifManager;
     Notification Notifi ;
     ArrayList<Observer> observers;
 
@@ -42,7 +48,6 @@ public class ObserveService extends Service {
     public void onCreate() {
         super.onCreate();
         observers = new ArrayList<>();
-        Notifi_M = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         myId = auth.getCurrentUser().getEmail();
         ConnectionController connectionController = new ConnectionController();
@@ -65,29 +70,7 @@ public class ObserveService extends Service {
                         public void OnDataChange(Object object) {
                             boolean alarm = (boolean)object;
                             if(!alarm){
-                                Intent intent = new Intent(ObserveService.this, MainActivity.class);
-                                PendingIntent pendingIntent = PendingIntent.getActivity(ObserveService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                Notifi = new Notification.Builder(getApplicationContext())
-                                        .setContentTitle("Content Title")
-                                        .setContentText("Content Text")
-                                        .setSmallIcon(R.drawable.cast_ic_notification_small_icon)
-                                        .setTicker("알림!!!")
-                                        .setContentIntent(pendingIntent)
-                                        .build();
-
-                                //소리추가
-                                Notifi.defaults = Notification.DEFAULT_SOUND;
-
-                                //알림 소리를 한번만 내도록
-                                Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
-
-                                //확인하면 자동으로 알림이 제거 되도록
-                                Notifi.flags = Notification.FLAG_AUTO_CANCEL;
-
-
-                                Notifi_M.notify( 777 , Notifi);
-
-                                Toast.makeText(ObserveService.this, "대상("+connection.tId+")이 위치 전송을 안합니다!", Toast.LENGTH_LONG).show();
+                               createNotification(connection.tId+"가 위치정보를 보내지않습니다.", "확인확인", ObserveService.this);
                             }
                         }
                     });
@@ -98,17 +81,8 @@ public class ObserveService extends Service {
                         public void OnDataChange(Object object) {
                             boolean emergency = (boolean)object;
                             if(emergency){
-                                Intent intent = new Intent(ObserveService.this, MainActivity.class);
-                                PendingIntent pendingIntent = PendingIntent.getActivity(ObserveService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                Notification noti = new Notification.Builder(getApplicationContext())
-                                        .setContentTitle("Guilbut 알림")
-                                        .setContentText(connection.tId+" 긴급신호!")
-                                        .setSmallIcon(R.drawable.cast_ic_notification_small_icon)
-                                        .setTicker("알림")
-                                        .setContentIntent(pendingIntent)
-                                        .build();
-                                Notifi_M.notify(0, noti);
-                                Toast.makeText(ObserveService.this, "대상("+connection.tId+")이 긴급신호를 보냈어요!", Toast.LENGTH_LONG).show();
+                                createNotification(connection.tId+"의 긴급신호!!!", connection.tId+"가 긴급 신호를 보냈습니다!!", ObserveService.this);
+                                showAEmergencyDialog(connection.tId);
                             }
                         }
                     });
@@ -131,5 +105,82 @@ public class ObserveService extends Service {
                 observer.removeObserver();
         }
         super.onDestroy();
+    }
+
+    public void createNotification(String notiTitle, String message, Context context) {
+        final int NOTIFY_ID = 0; // ID of notification
+        String id = context.getString(R.string.default_notification_channel_id); // default_channel_id
+        String title = context.getString(R.string.default_notification_channel_title); // Default Channel
+        Intent intent;
+        PendingIntent pendingIntent;
+        NotificationCompat.Builder builder;
+        if (notifManager == null) {
+            notifManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel mChannel = notifManager.getNotificationChannel(id);
+            if (mChannel == null) {
+                mChannel = new NotificationChannel(id, title, importance);
+                mChannel.enableVibration(true);
+                mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                notifManager.createNotificationChannel(mChannel);
+            }
+            builder = new NotificationCompat.Builder(context, id);
+            intent = new Intent(context, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+            builder.setContentTitle(notiTitle)                            // required
+                    .setSmallIcon(android.R.drawable.ic_popup_reminder)   // required
+                    .setContentText(context.getString(R.string.app_name)) // required
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setTicker(notiTitle)
+                    .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+        }
+        else {
+            builder = new NotificationCompat.Builder(context, id);
+            intent = new Intent(context, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+            builder.setContentTitle(notiTitle)                            // required
+                    .setSmallIcon(android.R.drawable.ic_popup_reminder)   // required
+                    .setContentText(context.getString(R.string.app_name)) // required
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setTicker(notiTitle)
+                    .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                    .setPriority(Notification.PRIORITY_HIGH);
+        }
+        Notification notification = builder.build();
+        notifManager.notify(NOTIFY_ID, notification);
+    }
+
+    // 다이얼로그 띄우기.
+    public void showAEmergencyDialog(final String targetId){
+            new AlertDialog.Builder(ObserveService.this)
+                    .setTitle("<긴급!!>")
+                    .setMessage(targetId+"가 긴급신로를 보냈했습니다.")
+                    .setPositiveButton("연결", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // 긴급 상태 업데이트
+                           Member member = new Member();
+                           member.setEmergency(targetId, false, new Member.OnSetCompleteListener() {
+                               @Override
+                               public void onComplete() {
+
+                               }
+
+                               @Override
+                               public void onFailure(String err) {
+
+                               }
+                           });
+                        }
+                    });
+
     }
 }
