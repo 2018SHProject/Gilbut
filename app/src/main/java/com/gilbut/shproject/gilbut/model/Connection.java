@@ -2,10 +2,11 @@ package com.gilbut.shproject.gilbut.model;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Connection {
+public class Connection implements Serializable {
     public  Long status;
     public String tId;
     public String pId;
