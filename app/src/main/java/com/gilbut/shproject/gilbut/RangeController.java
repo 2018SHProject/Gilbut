@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RangeController{
-    public ArrayList<LatLng> range;
+    public ArrayList<LatLng> range  = new ArrayList<LatLng>();
 
     public RangeController(){}
 
@@ -62,13 +62,15 @@ public class RangeController{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot latlngSnapshot : dataSnapshot.getChildren()){
-                    LatLng latLng = latlngSnapshot.getValue(LatLng.class);
-                    if(latLng != null){
+                    HashMap<String, Double> loca = (HashMap<String, Double>)latlngSnapshot.getValue();
+                    if(loca.get("latitude") != null && loca.get("longitude") != null) {
+                        LatLng latLng = new LatLng(loca.get("latitude"), loca.get("longitude"));
                         range.add(latLng);
                     }
                 }
                 onGetRangeListener.onComplete(range);
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -180,7 +182,7 @@ public class RangeController{
     }
 
     public interface OnGetRangeListener {
-        public void onComplete(List<LatLng> range);
+        public void onComplete(ArrayList<LatLng> range);
         public void onFailure(String err);
     }
 

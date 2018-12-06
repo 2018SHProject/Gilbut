@@ -344,7 +344,7 @@ public class Member {
     }
 
     // prevent 가져오기
-    public void getPrevent(final String protectorId, final OnGetEmergencyListener onGetEmergencyListener){
+    public void getPrevent(final String protectorId, final OnGetPreventListener onGetPreventListener){
         DatabaseReference ref = db.getReference("protector");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -352,16 +352,16 @@ public class Member {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     ProtectorMember protector = snapshot.getValue(ProtectorMember.class);
                     if (protector != null && protector.mId.equals(protectorId)) {
-                        onGetEmergencyListener.onComplete(protector.prevent);
+                        onGetPreventListener.onComplete(protector.prevent);
                     }else{
-                        onGetEmergencyListener.onFailure("타겟 없음");
+                        onGetPreventListener.onFailure("타겟 없음");
                     }
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                onGetEmergencyListener.onFailure(databaseError.toString());
+                onGetPreventListener.onFailure(databaseError.toString());
             }
         });
     }
@@ -383,6 +383,11 @@ public class Member {
 
     public interface OnGetEmergencyListener {
         public void onComplete(boolean emergency);
+        public void onFailure(String err);
+    }
+
+    public interface OnGetPreventListener {
+        public void onComplete(boolean prevent);
         public void onFailure(String err);
     }
 

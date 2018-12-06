@@ -18,10 +18,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.gilbut.shproject.gilbut.model.Connection;
+import com.gilbut.shproject.gilbut.model.TargetMember;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ObserveService extends Service {
     String myId;
@@ -51,16 +54,61 @@ public class ObserveService extends Service {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         myId = auth.getCurrentUser().getEmail();
         ConnectionController connectionController = new ConnectionController();
+        //연결들 중에서 나를 보호자로 하는 연결들을 찾음.
         connectionController.getProtectorConnections(myId, new ConnectionController.OnGetConnectionsListener() {
             @Override
             public void onComplete(ArrayList<Connection> connections) {
                 for(final Connection connection: connections){
                     Observer observer  = new Observer();
+                    // 관찰하고 있던 위치값이 바뀌면 실행할 함수 등록.
                     observer.setObservingLocation(connection.tId, new Observer.OnObservedDataChange() {
                         @Override
-                        public void OnDataChange(Object object) {
-                            LatLng location = (LatLng) object;
-                            //검사!!
+                        public void OnDataChange(final Object object) {
+                            final LatLng location = (LatLng)object;
+                            Toast.makeText(ObserveService.this, "대상 위치1"+location, Toast.LENGTH_SHORT).show();
+                            final Member member = new Member();
+                                // 범위 밖으로 가는거 알람인지 아니면 들어오는거 알람인지.
+                                member.getPrevent(myId, new Member.OnGetPreventListener() {
+                                    @Override
+                                    public void onComplete(final boolean prevent) {
+                                        RangeController rangeController = new RangeController();
+                                        if(!connection.rangeRef.equals("")) {
+                                            //연결에서 가져온 rangeRef로 Range가져오기.
+                                            rangeController.getRange(connection.rangeRef, new RangeController.OnGetRangeListener() {
+                                                @Override
+                                                public void onComplete(ArrayList<LatLng> range) {
+                                                    //*********결과에 따라 노티 표시.*************
+                                                    Toast.makeText(ObserveService.this, "대상 위치"+range, Toast.LENGTH_SHORT).show();
+                                                    boolean result = checkLeave(location,range,prevent );
+                                                    Toast.makeText(ObserveService.this, "결과는: "+result, Toast.LENGTH_SHORT).show();
+                                                    if(!result){
+                                                        Toast.makeText(ObserveService.this, "대상 위치!!", Toast.LENGTH_SHORT).show();
+                                                        if(prevent){
+                                                            createNotification(connection.tId+"가 범위를 벗어났습니다.",connection.tId+"가 범위를 벗어났습니다.",ObserveService.this);
+                                                        }else{
+                                                            createNotification(connection.tId+"가 범위안으로 들어왔습니다.",connection.tId+"가 범위안으로 들어왔습니다.",ObserveService.this);
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(String err) {
+
+                                                }
+                                            });
+
+                                        }else{
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(String err) {
+
+                                    }
+                                });
+
+
                         }
                     });
 
@@ -104,6 +152,34 @@ public class ObserveService extends Service {
                 observer.removeObserver();
         }
         super.onDestroy();
+    }
+
+    public boolean checkLeave(LatLng targetPoint, ArrayList<LatLng> lists, boolean Tprevent){
+
+        boolean inside = PolyUtil.containsLocation(targetPoint, lists , true );
+        // true 면 좌표 안에 존재하는 것
+        // false 면 좌표 안에 존재하지 않는 것
+        if(Tprevent){ // Tprevent에 따라 return이 달라짐
+            //ex Tprevent == true >> 범위 이탈을 보고 싶다
+            // Tprevent == true && inside == true
+            // 범위 내에 잘 있다
+            //Tprevent == true && inside == false
+            // 범위 이탈 했다.
+            return inside;
+        }
+        else{
+            // Tprevent == false >> 접근 금지를 보고 싶다
+            // 범위 내에 있지 않다
+            //Tprevent == false && inside == true
+            // 범위 내로 접근 했다.
+            //Tprevent == false && inside == false
+            // 범위에 접근 하지 않았다
+            return !(inside);
+
+            // 아무튼 inside가 false 일 때 알림 주기
+            // else 에서 return !(inside) 이기 때문에
+            // 안에 포함되는 경우 (접근한 경우)
+        }
     }
 
     public void createNotification(String notiTitle, String message, Context context) {
