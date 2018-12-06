@@ -322,11 +322,28 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             public void onComplete(ArrayList<Connection> connection) {
                 connections.addAll(connection);
 
-                // 여기에 새롭게 printRangeMap하는 함수 추가해서 범위 그리기
+                //TODO 여기에 새롭게 printRangeMap하는 함수 추가해서 범위 그리기
 
                 arrayAdapter = new TargetListAdapter(Pcontext, layout.target_list, connections);
                 listView.setAdapter(arrayAdapter);
                // Connection c = listView.getAdapter().getItem(0);
+
+                for(final Connection connet : connection){
+                    Member member = new Member();
+                    member.getEmergency(connet.tId, new Member.OnGetEmergencyListener() {
+                        @Override
+                        public void onComplete(boolean emergency) {
+                            if(emergency){
+                                showEmergencyDialog(connet.tId);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(String err) {
+
+                        }
+                    });
+                }
 
             }
 
@@ -586,5 +603,31 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+    }
+
+    // 다이얼로그 띄우기.
+    public void showEmergencyDialog(final String targetId){
+        new AlertDialog.Builder(ProtectorActivity.this)
+                .setTitle("<긴급!!>")
+                .setMessage(targetId+"가 긴급신로를 보냈했습니다.")
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 긴급 상태 업데이트
+                        Member member = new Member();
+                        member.setEmergency(targetId, false, new Member.OnSetCompleteListener() {
+                            @Override
+                            public void onComplete() {
+
+                            }
+
+                            @Override
+                            public void onFailure(String err) {
+
+                            }
+                        });
+                    }
+                }).show();
+
     }
 }

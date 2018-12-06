@@ -62,34 +62,6 @@ public class ConnectionController {
         });
     }
 
-    // 범위 나가는거인지 들어오는거인지 설정하는거 업데이트
-    public void updateConnectionPrevent(final String targetId, final String protectorId, final boolean prevent, @Nullable final OnSetCompleteListener onUpdateCompleteListener){
-        final DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Connection connection = dataSnapshot.getValue(Connection.class);
-                long now = System.currentTimeMillis();
-                Date date = new Date(now);
-                SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String time = transFormat.format(date);
-                Connection connectionUpdates = new Connection((long) connection.status, targetId, protectorId, connection.rangeRef, time, prevent);
-                ref.setValue(connectionUpdates, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        onUpdateCompleteListener.onComplete();
-                    }
-                });
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
     // 범위 저장된 위치 reference 업데이트
     public void updateConnectionRangeReference(final String targetId, final String protectorId, final String rangeRef, @Nullable final OnSetCompleteListener onUpdateCompleteListener){
         final DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".",""));
