@@ -252,7 +252,10 @@ public class TargetActivity extends AppCompatActivity {
         list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //리스트 띄우기. 이것도 다이얼로그로?
+                //리스트 띄우기. 이것도 다이얼로그로 -> 시간촉박해서 그냥 액티비티 띄우겠음
+                Intent i = new Intent(getApplicationContext(), ProtectorListActivity.class);
+                i.putExtra("list",plist);
+                startActivity(i);
             }
         });
 

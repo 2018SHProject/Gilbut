@@ -17,67 +17,49 @@ import java.util.ArrayList;
 
 public class ProtectorListAdapter extends ArrayAdapter<Connection> {
     ArrayList<Connection> list;
-    Button button;
     Context context;
-    LatLng latLng;
-    TextView tid;
-    public ProtectorListAdapter( Context context, int resource,  ArrayList<Connection> objects) {
+    TextView pid;
+    TextView status;
+
+    public ProtectorListAdapter(Context context, int resource, ArrayList<Connection> objects) {
         super(context, resource, objects);
 
         this.list = objects;
         this.context = context;
     }
 
-    public View getView(int position, View view , final ViewGroup parent){
+    public View getView(int position, View view, final ViewGroup parent) {
         View v = view;
-        if(v== null){
+        if (v == null) {
             LayoutInflater vi =
-                    (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(R.layout.target_list, null);
+                    (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            v = vi.inflate(R.layout.protector_list, null);
 
 
         }
 
         final Connection connection = list.get(position);
-        if(connection != null){
-            tid = (TextView)v.findViewById(R.id.target_id);
-            final TextView tpos = (TextView)v.findViewById(R.id.target_pos);
+        if (connection != null) {
+            pid = (TextView) v.findViewById(R.id.pId);
+            status = (TextView) v.findViewById(R.id.status);
 
-
-            if(tid != null){
-                tid.setText(connection.tId);
-
+            if (pid != null) {
+                pid.setText(connection.pId);
             }
-            if(tpos != null){
-                Member member = new Member();
-                member.getLocation(connection.tId, new Member.OnGetLocationListener() {
-                    @Override
-                    public void onComplete(LatLng location) {
-                        if(location != null)
-                            latLng = location;
-                        tpos.setText(String.valueOf(location.latitude) + ", " +String.valueOf(location.longitude));
-                    }
 
-                    @Override
-                    public void onFailure(String err) {
+            long checkStatus = connection.status;
 
-                    }
-                });
-
+            if (checkStatus == 1) {
+                status.setText("연결됨");
+            } else if (checkStatus == 0) {
+                status.setText("수락 대기중");
+            } else if (checkStatus == -1) {
+                status.setText("연결 거절");
+            } else {
+                status.setText("err");
             }
         }
-
-        button = (Button)v.findViewById(R.id.goto_setting);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(parent.getContext(), SettingActivity.class);
-                intent.putExtra("targetId", tid.getText());
-                ((Activity)parent.getContext()).startActivityForResult(intent, 1);
-                //Toast.makeText(context, "?", Toast.LENGTH_LONG).show();
-            }
-        });
         return v;
     }
-
 }
+
