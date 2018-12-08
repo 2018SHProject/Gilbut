@@ -35,7 +35,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -163,7 +165,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
                 // 요청 승인 확인
 
 
-                initFire();
+               // initFire();
                 break;
             case 2 :
 
@@ -270,7 +272,7 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
                         // 요청 승인 확인
 
 
-                        initFire();
+                        //initFire();
                         break;
                     case 2 :
 
@@ -327,6 +329,20 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
                 for(final Connection connet : connection){
                     Member member = new Member();
+                    member.getLocation(connet.tId, new Member.OnGetLocationListener() {
+                        @Override
+                        public void onComplete(LatLng location) {
+                            if(location != null) {
+                                printTargetMap(location.latitude, location.longitude, connet.tId);
+
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(String err) {
+
+                        }
+                    });
                     member.getEmergency(connet.tId, new Member.OnGetEmergencyListener() {
                         @Override
                         public void onComplete(boolean emergency) {
@@ -440,6 +456,20 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
     }
 
+
+    public void printTargetMap(double lat, double lng, String ttid){
+        final LatLng Loc = new LatLng(lat, lng);
+        MarkerOptions options = new MarkerOptions();
+        options.position(Loc);
+        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        options.title(ttid);
+        map.addMarker(options);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
+
+        // 여기서 범위 이탈 체크하고 알림 주기
+
+    }
+
     public void printMap(double lat, double lng){
         final LatLng Loc = new LatLng(lat, lng);
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(Loc, 16));
@@ -476,9 +506,9 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
         }
     }
 
-    public void initFire(){
+    public void initFire(String Tidd){
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("TargetLatlng");
+        databaseReference = firebaseDatabase.getReference(Tidd);
         // 임시로 붙인 레퍼런스 이름 - 정동이 디비에 보낼 때 지정하는 이름
 
 
