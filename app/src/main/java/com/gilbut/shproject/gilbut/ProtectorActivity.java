@@ -343,7 +343,25 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
 
                         }
                     });
-                    member.getEmergency(connet.tId, new Member.OnGetEmergencyListener() {
+
+                    RangeController rangeController = new RangeController();
+                    if(!connet.rangeRef.equals("")) {
+                        rangeController.getRange(connet.rangeRef, new RangeController.OnGetRangeListener() {
+                            @Override
+                            public void onComplete(ArrayList<LatLng> range) {
+                                printRangeMap(range);
+                            }
+
+                            @Override
+                            public void onFailure(String err) {
+
+                            }
+                        });
+                    }
+
+
+
+                        member.getEmergency(connet.tId, new Member.OnGetEmergencyListener() {
                         @Override
                         public void onComplete(boolean emergency) {
                             if(emergency){
