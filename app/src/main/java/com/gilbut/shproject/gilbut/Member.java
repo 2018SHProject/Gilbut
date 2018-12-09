@@ -1,10 +1,8 @@
 package com.gilbut.shproject.gilbut;
 
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.gilbut.shproject.gilbut.model.Connection;
 import com.gilbut.shproject.gilbut.model.ProtectorMember;
 import com.gilbut.shproject.gilbut.model.TargetMember;
 import com.google.android.gms.maps.model.LatLng;
@@ -15,6 +13,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -162,7 +161,11 @@ public class Member {
                     TargetMember target = snapshot.getValue(TargetMember.class);
                     if (target != null && target.mId.equals(targetId)) {
                         LatLng newLocation = target.getLocation();
-                        onGetLocationListener.onComplete(newLocation);
+                        try {
+                            onGetLocationListener.onComplete(newLocation);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }else{
                         onGetLocationListener.onFailure("타겟 없음");
                     }
@@ -397,7 +400,7 @@ public class Member {
     }
 
     public interface OnGetLocationListener {
-        public void onComplete(LatLng location);
+        public void onComplete(LatLng location) throws IOException;
         public void onFailure(String err);
     }
 }
