@@ -227,6 +227,8 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             boolean pre_pro = data.getBooleanExtra("pre_pro",true);
             //default 는 true >> 이탈 금지
             //이 pre_pro를 연결 또는 보호자에 적용하면 됩니다!
+            //TODO 여기다가 가져오는 부분 추가했어여
+
 
             if(latLngs != null) {
                 // LatLng 넘어옴
@@ -325,8 +327,6 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             @Override
             public void onComplete(ArrayList<Connection> connection) {
                 connections.addAll(connection);
-
-                //TODO 여기에 새롭게 printRangeMap하는 함수 추가해서 범위 그리기
 
                 arrayAdapter = new TargetListAdapter(Pcontext, layout.target_list, connections);
                 listView.setAdapter(arrayAdapter);
