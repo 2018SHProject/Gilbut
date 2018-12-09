@@ -20,6 +20,14 @@
         android:background="#ffcb51"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <ToggleButton
+        android:id="@+id/pre_pro"
+        android:checked="true"
+        android:textOn="이탈 금지"
+        android:textOff="접근 금지"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
 
 </LinearLayout>

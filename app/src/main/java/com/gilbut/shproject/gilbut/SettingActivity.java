@@ -11,11 +11,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Range;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ToggleButton;
 
-import com.gilbut.shproject.gilbut.model.Connection;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -55,6 +54,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
     ArrayList<LatLng> arrayPoints;
 
     Button button;
+    ToggleButton pre_pro;
 
     String targetId;
 
@@ -95,6 +95,10 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
         final String protectorId =  auth.getCurrentUser().getEmail();
 
         polygonOptions = new PolygonOptions();
+
+        pre_pro = (ToggleButton)findViewById(R.id.pre_pro);
+        pre_pro.setTextOn("이탈 금지");
+        pre_pro.setTextOff("접근 금지");
 
         button = (Button)findViewById(R.id.end_of_poly);
         button.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +141,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
                 //result.putExtra("setting", range);
                 result.putExtra("setting", arrayPoints);
                 result.putExtra("test", "test");
+                result.putExtra("pre_pro",pre_pro.isChecked());
                 //1 대신 범위 정보
                 setResult(1,result);
                 finish();

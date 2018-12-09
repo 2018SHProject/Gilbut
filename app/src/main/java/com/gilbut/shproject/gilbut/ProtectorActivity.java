@@ -223,6 +223,11 @@ public class ProtectorActivity extends AppCompatActivity implements  GoogleApiCl
             Intent i = getIntent();
             //RangeController latLngs = bundle.getParcelable("setting");
             ArrayList<LatLng> latLngs = data.getParcelableArrayListExtra("setting");
+
+            boolean pre_pro = data.getBooleanExtra("pre_pro",true);
+            //default 는 true >> 이탈 금지
+            //이 pre_pro를 연결 또는 보호자에 적용하면 됩니다!
+
             if(latLngs != null) {
                 // LatLng 넘어옴
                 PolygonOptions polygonOptions = new PolygonOptions();
