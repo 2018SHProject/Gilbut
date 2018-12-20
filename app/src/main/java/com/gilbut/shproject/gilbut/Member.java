@@ -265,7 +265,7 @@ public class Member {
         });
     }
 
-    //긴급상황 이라고 보내기! ( 값을 바꾸면 이 값을 관찰하고 있던 보호자 측에서 알게 되는걸로..)
+    //긴급상황 이라고 보내기! ( 값을 바꾸면 이 값을 관찰하고 있던 보호자 측에서 알게 됨...)
     public void setEmergency(final String targetId, final boolean emergency, final OnSetCompleteListener onSetCompleteListener){
         final DatabaseReference ref = db.getReference("target");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -295,7 +295,7 @@ public class Member {
     }
 
     // 긴급 상황인지 가져오기(노쓸모 예정)
-    public void getEmergency(final String targetId, final OnGetEmergencyListener onGetEmergencyListener){
+    public void getEmergency(final String targetId, final OnGetEmergencyListener onGetEmergencyListener) {
         DatabaseReference ref = db.getReference("target");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -304,7 +304,7 @@ public class Member {
                     TargetMember target = snapshot.getValue(TargetMember.class);
                     if (target != null && target.mId.equals(targetId)) {
                         onGetEmergencyListener.onComplete(target.emergency);
-                    }else{
+                    } else {
                         onGetEmergencyListener.onFailure("타겟 없음");
                     }
                 }
@@ -316,59 +316,6 @@ public class Member {
             }
         });
     }
-
-    //prevent 설정
-    public void setPrevent(final String protectorId, final boolean prevent, final OnSetCompleteListener onSetCompleteListener){
-        final DatabaseReference ref = db.getReference("protector");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    ProtectorMember protector = snapshot.getValue(ProtectorMember.class);
-                    if (protector != null && protector.mId.equals(protectorId)) {
-                        snapshot.getRef().child("emergency").setValue(prevent, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                if(onSetCompleteListener!=null){
-                                    onSetCompleteListener.onComplete();
-                                }
-                            }
-                        });
-                    }else{
-                        onSetCompleteListener.onFailure("no target");
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                onSetCompleteListener.onFailure("on cancel");
-            }
-        });
-    }
-
-    // prevent 가져오기
-    public void getPrevent(final String protectorId, final OnGetPreventListener onGetPreventListener){
-        DatabaseReference ref = db.getReference("protector");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    ProtectorMember protector = snapshot.getValue(ProtectorMember.class);
-                    if (protector != null && protector.mId.equals(protectorId)) {
-                        onGetPreventListener.onComplete(protector.prevent);
-                    }else{
-                        onGetPreventListener.onFailure("타겟 없음");
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                onGetPreventListener.onFailure(databaseError.toString());
-            }
-        });
-    }
-
 
     public interface OnGetTargetListener{
         public void onGetData(TargetMember target);
@@ -386,11 +333,6 @@ public class Member {
 
     public interface OnGetEmergencyListener {
         public void onComplete(boolean emergency);
-        public void onFailure(String err);
-    }
-
-    public interface OnGetPreventListener {
-        public void onComplete(boolean prevent);
         public void onFailure(String err);
     }
 

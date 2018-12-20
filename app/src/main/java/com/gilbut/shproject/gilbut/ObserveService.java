@@ -67,44 +67,32 @@ public class ObserveService extends Service {
                             final LatLng location = (LatLng)object;
                             final Member member = new Member();
                                 // 범위 밖으로 가는거 알람인지 아니면 들어오는거 알람인지.
-                                member.getPrevent(myId, new Member.OnGetPreventListener() {
-                                    @Override
-                                    public void onComplete(final boolean prevent) {
-                                        RangeController rangeController = new RangeController();
-                                        if(!connection.rangeRef.equals("")) {
-                                            //연결에서 가져온 rangeRef로 Range가져오기.
-                                            rangeController.getRange(connection.rangeRef, new RangeController.OnGetRangeListener() {
-                                                @Override
-                                                public void onComplete(ArrayList<LatLng> range) {
-                                                    //*********결과에 따라 노티 표시.*************
-                                                    boolean result = checkLeave(location,range,prevent );
-                                                    if(!result){
-                                                        if(prevent){
-                                                            createNotification(connection.tId+"가 범위를 벗어났습니다.",connection.tId+"가 범위를 벗어났습니다.",ObserveService.this);
-                                                        }else{
-                                                            createNotification(connection.tId+"가 범위안으로 들어왔습니다.",connection.tId+"가 범위안으로 들어왔습니다.",ObserveService.this);
-                                                        }
-                                                    }
+                                RangeController rangeController = new RangeController();
+                                if(!connection.rangeRef.equals("")) {
+                                    //연결에서 가져온 rangeRef로 Range가져오기.
+                                    rangeController.getRange(connection.rangeRef, new RangeController.OnGetRangeListener() {
+                                        @Override
+                                        public void onComplete(ArrayList<LatLng> range) {
+                                            //*********결과에 따라 노티 표시.*************
+                                            boolean result = checkLeave(location,range, connection.prevent );
+                                            if(!result){
+                                                if(connection.prevent){
+                                                    createNotification(connection.tId+"가 범위를 벗어났습니다.",connection.tId+"가 범위를 벗어났습니다.",ObserveService.this);
+                                                }else{
+                                                    createNotification(connection.tId+"가 범위안으로 들어왔습니다.",connection.tId+"가 범위안으로 들어왔습니다.",ObserveService.this);
                                                 }
+                                            }
+                                        }
 
-                                                @Override
-                                                public void onFailure(String err) {
-
-                                                }
-                                            });
-
-                                        }else{
+                                        @Override
+                                        public void onFailure(String err) {
 
                                         }
-                                    }
+                                    });
 
-                                    @Override
-                                    public void onFailure(String err) {
+                                }else{
 
-                                    }
-                                });
-
-
+                                }
                         }
                     });
 

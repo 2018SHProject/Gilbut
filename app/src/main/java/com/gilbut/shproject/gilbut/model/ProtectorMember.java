@@ -2,7 +2,6 @@ package com.gilbut.shproject.gilbut.model;
 
 public class ProtectorMember{
     public String mId;
-    public boolean prevent;
 
     public ProtectorMember() {}
 

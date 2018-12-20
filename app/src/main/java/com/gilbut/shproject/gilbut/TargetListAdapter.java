@@ -63,7 +63,9 @@ public class TargetListAdapter extends ArrayAdapter<Connection> {
                         if(location != null) {
                             //tpos.setText(String.valueOf(location.latitude) + ", " + String.valueOf(location.longitude));
                             List<Address> address = geocoder.getFromLocation(location.latitude, location.longitude, 1);
-                            tpos.setText(address.get(0).getAddressLine(0).toString());
+                            if(!address.isEmpty()) {
+                                tpos.setText(address.get(0).getAddressLine(0).toString());
+                            }
                         }
                     }
 

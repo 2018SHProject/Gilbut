@@ -1,5 +1,6 @@
 package com.gilbut.shproject.gilbut;
 
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 
 import com.gilbut.shproject.gilbut.model.Connection;
@@ -213,6 +214,29 @@ public class ConnectionController {
         });
     }
 
+    public void getPrevent(final String targetId, final String protectorId, final OnGetPreventListener onGetPreventListener){
+        DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".", ""));
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Connection connection = dataSnapshot.getValue(Connection.class);
+                if(connection != null){
+                    onGetPreventListener.onComplete(connection.prevent);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                onGetPreventListener.onFailure(databaseError.toString());
+            }
+        });
+    }
+
+    public void setPrevent(final String targetId, final String protectorId, boolean prevent){
+        DatabaseReference ref = db.getReference("connection/"+targetId.replace(".","")+"-"+protectorId.replace(".", "")+"/prevent");
+        ref.setValue(prevent);
+    }
+
     // 각종 리스너들. 비동기 처리를 위해 만듬.
     public interface OnSetCompleteListener {
         public void onComplete();
@@ -231,6 +255,11 @@ public class ConnectionController {
 
     public interface OnGetConnectionsListener {
         public void onComplete(ArrayList<Connection> connections);
+        public void onFailure(String err);
+    }
+
+    public interface OnGetPreventListener {
+        public void onComplete(boolean prevent);
         public void onFailure(String err);
     }
 

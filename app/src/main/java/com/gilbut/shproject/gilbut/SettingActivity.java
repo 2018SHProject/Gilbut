@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -99,6 +100,13 @@ public class SettingActivity extends AppCompatActivity implements GoogleMap.OnMa
         pre_pro = (ToggleButton)findViewById(R.id.pre_pro);
         pre_pro.setTextOn("이탈 금지");
         pre_pro.setTextOff("접근 금지");
+        pre_pro.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isPrevent) {
+                ConnectionController connectionController = new ConnectionController();
+                connectionController.setPrevent(targetId, protectorId, isPrevent);
+            }
+        });
 
         button = (Button)findViewById(R.id.end_of_poly);
         button.setOnClickListener(new View.OnClickListener() {
